@@ -1,0 +1,48 @@
+/**
+ * Cubique
+ * @author    Alexander Plutov
+ * @copyright (c) 2011 Alexander Plutov
+ * @license   https://github.com/plutov/cubique/blob/master/LICENSE
+ */
+
+table.cubique, table.cubique tbody, table.cubique tfoot, table.cubique thead, table.cubique tr, table.cubique th,
+table.cubique td {
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+    outline: 0px;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+table.cubique {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.cubique th, table.cubique td {
+    font-weight: normal;
+    border: 1px solid #ccc;
+    background: #333;
+    color: #fff;
+    padding: 2px;
+}
+
+table.cubique td {
+    background: transparent;
+    color: #333;
+}
+
+table.cubique td.loading {
+    height: 50px;
+    position: relative;
+}
+
+table.cubique td.loading img {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin: -8px 0px 0px -8px;
+}
