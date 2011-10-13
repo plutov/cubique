@@ -12,12 +12,14 @@
  */
 Cubique = function(options)
 {
-    local            = this;
-    local.name       = options.name;
-    local.columns    = options.columns;
-    local.rowsOnPage = options.rows_on_page;
-    local.count      = 0;
-    local.currPage   = 1;
+    local               = this;
+    local.name          = options.name;
+    local.columns       = options.columns;
+    local.rowsOnPage    = options.rows_on_page;
+    local.columnsToSort = options.columns_to_sort;
+    local.count         = 0;
+    local.currPage      = 1;
+    local.sort          = '';
     local.renderGrid();
     local.displayData();
 }
@@ -28,12 +30,27 @@ Cubique = function(options)
  */
 Cubique.prototype.renderGrid = function Cubique_renderGrid()
 {
-    var html = '<table class="cubique"><thead>';
+    var html   = '<table class="cubique"><thead>';
+    var column = '';
     for (var columnName in local.columns) {
-        html += '<th>' + local.columns[columnName] + '</th>';
+        if (typeof(local.columnsToSort[columnName]) != 'undefined') {
+            column = '<a href="#" class="sort-by" sort-column="' + columnName + '" sort-rotation="ASC">' + local.columns[columnName] + '</a>';
+        } else {
+            column = local.columns[columnName];
+        }
+        html += '<th>' + column + '</th>';
     }
     html += '</thead><tbody></tbody></table>';
     $('#cubique-' + local.name).html(html);
+    var sortRotation = 'ASC';
+    $('#cubique-' + local.name + ' a.sort-by').click(function() {
+        local.currPage = 1;
+        sortRotation = $(this).attr('sort-rotation');
+        $(this).attr('sort-rotation', sortRotation == 'ASC' ? 'DESC' : 'ASC');
+        local.sort = $(this).attr('sort-column') + ' ' + sortRotation;
+        local.displayData();
+        return false;
+    });
     local.tbody = $('#cubique-' + local.name + ' tbody');
 }
 
@@ -50,7 +67,8 @@ Cubique.prototype.displayData = function Cubique_displayData()
         type:     'post',
         data:     {
             cubique_grid_name:      local.name,
-            cubique_grid_curr_page: local.currPage
+            cubique_grid_curr_page: local.currPage,
+            cubique_grid_sort:      local.sort
         },
         url:      location.href,
         dataType: 'json',
@@ -60,10 +78,12 @@ Cubique.prototype.displayData = function Cubique_displayData()
             } else {
                 local.count = response.count;
                 var html = '';
+                var tdClass = '';
                 for (var rowKey in response.data) {
+                    tdClass = (rowKey%2) ? ' gray' : '';
                     html += '<tr>';
                     for (var columnName in response.data[rowKey]) {
-                        html += '<td>' + response.data[rowKey][columnName] + '</td>';
+                        html += '<td class="' + tdClass + '">' + response.data[rowKey][columnName] + '</td>';
                     }
                     html += '</tr>';
                 }

@@ -29,9 +29,17 @@ table.cubique th, table.cubique td {
     text-align: left;
 }
 
+table.cubique th a.sort-by {
+    color: #fff;
+}
+
 table.cubique td {
     background: transparent;
     color: #333;
+}
+
+table.cubique td.gray {
+    background: #eee;
 }
 
 table.cubique td.loading {
@@ -48,12 +56,12 @@ table.cubique td.loading img {
     margin: -8px 0px 0px -8px;
 }
 
-table.cubique .go-to-page {
+table.cubique a.go-to-page {
     color: #fff;
     margin: 0px 3px;
     text-decoration: none;
 }
 
-table.cubique .curr {
+table.cubique a.curr {
     text-decoration: underline;
 }

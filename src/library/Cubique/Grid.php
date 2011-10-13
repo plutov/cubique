@@ -33,6 +33,12 @@ class Cubique_Grid
     private $_rowsOnPage = 10;
 
     /**
+     * Columns names for which sorting is available
+     * @var array
+     */
+    private $_columnsToSort = array();
+
+    /**
      * Constructor
      * @param string $name
      */
@@ -76,18 +82,17 @@ class Cubique_Grid
         if (!is_array($columns)) {
             throw new Cubique_Exception('Array expected for `$columns`');
         }
-        if (!count($columns)) {
-            throw new Cubique_Exception('`$columns` can not be empty');
-        }
-        foreach ($columns as $columnName => $columnLabel) {
-            if (!is_string($columnName)) {
-                throw new Cubique_Exception('String expected for `$columnName`');
+        if (count($columns)) {
+            foreach ($columns as $columnName => $columnLabel) {
+                if (!is_string($columnName)) {
+                    throw new Cubique_Exception('String expected for `$columnName`');
+                }
+                if (!is_string($columnLabel)) {
+                    throw new Cubique_Exception('String expected for `$columnLabel`');
+                }
             }
-            if (!is_string($columnLabel)) {
-                throw new Cubique_Exception('String expected for `$columnLabel`');
-            }
+            $this->_columns = $columns;
         }
-        $this->_columns = $columns;
         return $this;
     }
 
@@ -106,6 +111,28 @@ class Cubique_Grid
     }
 
     /**
+     * Set columns for which sorting is available
+     * @param  array $columnsToSort
+     * @return Cubique_Grid
+     */
+    public function setColumnsToSort($columnsToSort)
+    {
+        if (!is_array($columnsToSort)) {
+            throw new Cubique_Exception('Array expected for `$columnsToSort`');
+        }
+        $columnsToSort         = array_values($columnsToSort);
+        $columnsToSortWithKeys = array();
+        foreach ($columnsToSort as $columnName) {
+            if (!is_string($columnName)) {
+                throw new Cubique_Exception('String expected for `$columnName`');
+            }
+            $columnsToSortWithKeys[$columnName] = $columnName;
+        }
+        $this->_columnsToSort = $columnsToSortWithKeys;
+        return $this;
+    }
+
+    /**
      * Return HTML and Javascript for grid initialization
      * @return string
      */
@@ -115,9 +142,10 @@ class Cubique_Grid
             throw new Cubique_Exception('`$columns` can not be empty');
         }
         $options = array(
-            'name'         => $this->_name,
-            'columns'      => $this->_columns,
-            'rows_on_page' => $this->_rowsOnPage
+            'name'            => $this->_name,
+            'columns'         => $this->_columns,
+            'rows_on_page'    => $this->_rowsOnPage,
+            'columns_to_sort' => $this->_columnsToSort
         );
         $optionsJson = Zend_Json_Encoder::encode($options);
         $html = '<div id="cubique-' . $this->_name . '"></div>' .
@@ -142,10 +170,14 @@ class Cubique_Grid
         );
         try {
             $currPage = intval($post['cubique_grid_curr_page']);
-            $table = new Zend_Db_Table($this->_table);
-            $select = $table->select()
+            $sort     = $post['cubique_grid_sort'];
+            $table    = new Zend_Db_Table($this->_table);
+            $select   = $table->select()
                     ->from($this->_table, array_keys($this->_columns))
                     ->limitPage($currPage, $this->_rowsOnPage);
+            if ($sort) {
+                $select->order($sort);
+            }
             $result['data'] = $table->fetchAll($select)->toArray();
             $result['count'] = $table->fetchAll($table->select())->count();
         } catch (Exception $e) {
