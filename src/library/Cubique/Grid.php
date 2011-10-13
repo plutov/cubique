@@ -27,6 +27,12 @@ class Cubique_Grid
     private $_columns;
 
     /**
+     * Number of displayed rows on page
+     * @var int
+     */
+    private $_rowsOnPage = 10;
+
+    /**
      * Constructor
      * @param string $name
      */
@@ -86,6 +92,20 @@ class Cubique_Grid
     }
 
     /**
+     * Set number of displayed rows on page
+     * @param  int $rowsOnPage
+     * @return void
+     */
+    public function setRowsOnPage($rowsOnPage)
+    {
+        if (!is_array($rowsOnPage)) {
+            throw new Cubique_Exception('Int expected for `$rowsOnPage`');
+        }
+        $this->_rowsOnPage = $rowsOnPage;
+        return $this;
+    }
+
+    /**
      * Return HTML and Javascript for grid initialization
      * @return string
      */
@@ -95,8 +115,9 @@ class Cubique_Grid
             throw new Cubique_Exception('`$columns` can not be empty');
         }
         $options = array(
-            'name'    => $this->_name,
-            'columns' => $this->_columns
+            'name'         => $this->_name,
+            'columns'      => $this->_columns,
+            'rows_on_page' => $this->_rowsOnPage
         );
         $optionsJson = Zend_Json_Encoder::encode($options);
         $html = '<div id="cubique-' . $this->_name . '"></div>' .
@@ -109,19 +130,24 @@ class Cubique_Grid
 
     /**
      * Return data
+     * @param  array $post
      * @return array
      */
-    public function getData()
+    public function getData($post)
     {
         $result = array(
             'error' => false,
-            'data'  => array()
+            'data'  => array(),
+            'count' => 0
         );
         try {
+            $currPage = intval($post['cubique_grid_curr_page']);
             $table = new Zend_Db_Table($this->_table);
             $select = $table->select()
-                    ->from($this->_table, array_keys($this->_columns));
+                    ->from($this->_table, array_keys($this->_columns))
+                    ->limitPage($currPage, $this->_rowsOnPage);
             $result['data'] = $table->fetchAll($select)->toArray();
+            $result['count'] = $table->fetchAll($table->select())->count();
         } catch (Exception $e) {
             $result['error'] = true;
         }

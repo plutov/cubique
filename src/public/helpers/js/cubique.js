@@ -12,9 +12,12 @@
  */
 Cubique = function(options)
 {
-    local         = this;
-    local.name    = options.name;
-    local.columns = options.columns;
+    local            = this;
+    local.name       = options.name;
+    local.columns    = options.columns;
+    local.rowsOnPage = options.rows_on_page;
+    local.count      = 0;
+    local.currPage   = 1;
     local.renderGrid();
     local.displayData();
 }
@@ -46,7 +49,8 @@ Cubique.prototype.displayData = function Cubique_displayData()
     $.ajax({
         type:     'post',
         data:     {
-            cubique_grid_name: local.name
+            cubique_grid_name:      local.name,
+            cubique_grid_curr_page: local.currPage
         },
         url:      location.href,
         dataType: 'json',
@@ -54,6 +58,7 @@ Cubique.prototype.displayData = function Cubique_displayData()
             if (response.error) {
                 alert('Error has been occurred. Try to refresh the page.');
             } else {
+                local.count = response.count;
                 var html = '';
                 for (var rowKey in response.data) {
                     html += '<tr>';
@@ -63,9 +68,32 @@ Cubique.prototype.displayData = function Cubique_displayData()
                     html += '</tr>';
                 }
                 local.tbody.html(html);
+                local.renderPagesSection();
             }
             loading.remove();
         }
+    });
+}
+
+/**
+ * Render pages section
+ * @return void
+ */
+Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
+{
+    var pages      = '';
+    var currClass  = '';
+    var pagesCount = Math.ceil(local.count/local.rowsOnPage);
+    for (var i = 1; i <= pagesCount; i++) {
+        currClass = i == local.currPage ? ' curr' : ''
+        pages += '<a href="#" class="go-to-page' + currClass + '" page-number="' + i + '">' + i + '</a>';
+    }
+    var html = '<tr><th colspan="' + Object.size(local.columns) + '">' + pages + '</th></tr>';
+    local.tbody.append(html);
+    local.tbody.find('.go-to-page').click(function() {
+        local.currPage = $(this).attr('page-number');
+        local.displayData();
+        return false;
     });
 }
 
