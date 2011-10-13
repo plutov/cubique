@@ -65,3 +65,8 @@ table.cubique a.go-to-page {
 table.cubique a.curr {
     text-decoration: underline;
 }
+
+table.cubique .in-total {
+    float: right;
+    margin-right: 5px;
+}

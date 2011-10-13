@@ -115,7 +115,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         } else {
             from = this.currPage - 9;
             to   = (this.currPage + 10 <= pagesCount) ? this.currPage + 10 : pagesCount;
-            pages += '<a href="#" class="go-to-page" page-number="1"><<</a>';
+            pages += '<a href="#" class="go-to-page" page-number="1">1</a>...';
         }
     }
     for (var i = from; i <= to; i++) {
@@ -123,9 +123,10 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         pages += '<a href="#" class="go-to-page' + currClass + '" page-number="' + i + '">' + i + '</a>';
     }
     if (pagesCount > to) {
-        pages += '<a href="#" class="go-to-page" page-number="' + pagesCount + '">>></a>';
+        pages += '...<a href="#" class="go-to-page" page-number="' + pagesCount + '">' + pagesCount + '</a>';
     }
-    var html = '<tr><th colspan="' + Object.size(this.columns) + '">' + pages + '</th></tr>';
+    var html = '<tr><th colspan="' + Object.size(this.columns) + '">' + pages + '<span class="in-total">' +
+               this.count + ' in total</span></th></tr>';
     this.tbody.append(html);
     var local = this;
     this.tbody.find('.go-to-page').click(function() {
