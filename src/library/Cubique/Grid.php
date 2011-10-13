@@ -39,6 +39,12 @@ class Cubique_Grid
     private $_columnsToSort = array();
 
     /**
+     * Columns names for escaping
+     * @var array
+     */
+    private $_columnsToEscape = array();
+
+    /**
      * Constructor
      * @param string $name
      */
@@ -133,6 +139,26 @@ class Cubique_Grid
     }
 
     /**
+     * Set columns for escaping
+     * @param  array $columnsToEscape
+     * @return Cubique_Grid
+     */
+    public function setColumnsToEscape($columnsToEscape)
+    {
+        if (!is_array($columnsToEscape)) {
+            throw new Cubique_Exception('Array expected for `$columnsToEscape`');
+        }
+        $columnsToEscape = array_values($columnsToEscape);
+        foreach ($columnsToEscape as $columnName) {
+            if (!is_string($columnName)) {
+                throw new Cubique_Exception('String expected for `$columnName`');
+            }
+        }
+        $this->_columnsToEscape = $columnsToEscape;
+        return $this;
+    }
+
+    /**
      * Return HTML and Javascript for grid initialization
      * @return string
      */
@@ -178,7 +204,16 @@ class Cubique_Grid
             if ($sort) {
                 $select->order($sort);
             }
-            $result['data'] = $table->fetchAll($select)->toArray();
+            $data = $table->fetchAll($select)->toArray();
+            if (count($this->_columnsToEscape)) {
+                $view = new Zend_View();
+                foreach ($data as &$row) {
+                    foreach ($this->_columnsToEscape as $escapeColumn) {
+                        $row[$escapeColumn] = $view->escape($row[$escapeColumn]);
+                    }
+                }
+            }
+            $result['data'] = $data;
             $result['count'] = $table->fetchAll($table->select())->count();
         } catch (Exception $e) {
             $result['error'] = true;
