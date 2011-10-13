@@ -103,7 +103,7 @@ class Cubique_Grid
      */
     public function setRowsOnPage($rowsOnPage)
     {
-        if (!is_array($rowsOnPage)) {
+        if (!is_int($rowsOnPage)) {
             throw new Cubique_Exception('Int expected for `$rowsOnPage`');
         }
         $this->_rowsOnPage = $rowsOnPage;

@@ -12,16 +12,16 @@
  */
 Cubique = function(options)
 {
-    local               = this;
-    local.name          = options.name;
-    local.columns       = options.columns;
-    local.rowsOnPage    = options.rows_on_page;
-    local.columnsToSort = options.columns_to_sort;
-    local.count         = 0;
-    local.currPage      = 1;
-    local.sort          = '';
-    local.renderGrid();
-    local.displayData();
+
+    this.name          = options.name;
+    this.columns       = options.columns;
+    this.rowsOnPage    = options.rows_on_page;
+    this.columnsToSort = options.columns_to_sort;
+    this.count         = 0;
+    this.currPage      = 1;
+    this.sort          = '';
+    this.renderGrid();
+    this.displayData();
 }
 
 /**
@@ -32,18 +32,19 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
 {
     var html   = '<table class="cubique"><thead>';
     var column = '';
-    for (var columnName in local.columns) {
-        if (typeof(local.columnsToSort[columnName]) != 'undefined') {
-            column = '<a href="#" class="sort-by" sort-column="' + columnName + '" sort-rotation="ASC">' + local.columns[columnName] + '</a>';
+    for (var columnName in this.columns) {
+        if (typeof(this.columnsToSort[columnName]) != 'undefined') {
+            column = '<a href="#" class="sort-by" sort-column="' + columnName + '" sort-rotation="ASC">' + this.columns[columnName] + '</a>';
         } else {
-            column = local.columns[columnName];
+            column = this.columns[columnName];
         }
         html += '<th>' + column + '</th>';
     }
     html += '</thead><tbody></tbody></table>';
-    $('#cubique-' + local.name).html(html);
+    $('#cubique-' + this.name).html(html);
     var sortRotation = 'ASC';
-    $('#cubique-' + local.name + ' a.sort-by').click(function() {
+    var local = this;
+    $('#cubique-' + this.name + ' a.sort-by').click(function() {
         local.currPage = 1;
         sortRotation = $(this).attr('sort-rotation');
         $(this).attr('sort-rotation', sortRotation == 'ASC' ? 'DESC' : 'ASC');
@@ -51,7 +52,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         local.displayData();
         return false;
     });
-    local.tbody = $('#cubique-' + local.name + ' tbody');
+    this.tbody = $('#cubique-' + this.name + ' tbody');
 }
 
 /**
@@ -60,9 +61,10 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
  */
 Cubique.prototype.displayData = function Cubique_displayData()
 {
-    var loading = $('<tr><td colspan="' + Object.size(local.columns) + '" class="loading">' +
+    var loading = $('<tr><td colspan="' + Object.size(this.columns) + '" class="loading">' +
                     '<img src="/helpers/img/cubique_loading.gif"/></td></tr>');
-    local.tbody.html(loading);
+    this.tbody.html(loading);
+    var local = this;
     $.ajax({
         type:     'post',
         data:     {
@@ -103,15 +105,31 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
 {
     var pages      = '';
     var currClass  = '';
-    var pagesCount = Math.ceil(local.count/local.rowsOnPage);
-    for (var i = 1; i <= pagesCount; i++) {
-        currClass = i == local.currPage ? ' curr' : ''
+    var pagesCount = Math.ceil(this.count/this.rowsOnPage);
+    var from       = 1;
+    var to         = pagesCount;
+    if (pagesCount > 20) {
+        if (this.currPage <= 10) {
+            from = 1;
+            to   = 20;
+        } else {
+            from = this.currPage - 9;
+            to   = (this.currPage + 10 <= pagesCount) ? this.currPage + 10 : pagesCount;
+            pages += '<a href="#" class="go-to-page" page-number="1"><<</a>';
+        }
+    }
+    for (var i = from; i <= to; i++) {
+        currClass = i == this.currPage ? ' curr' : ''
         pages += '<a href="#" class="go-to-page' + currClass + '" page-number="' + i + '">' + i + '</a>';
     }
-    var html = '<tr><th colspan="' + Object.size(local.columns) + '">' + pages + '</th></tr>';
-    local.tbody.append(html);
-    local.tbody.find('.go-to-page').click(function() {
-        local.currPage = $(this).attr('page-number');
+    if (pagesCount > to) {
+        pages += '<a href="#" class="go-to-page" page-number="' + pagesCount + '">>></a>';
+    }
+    var html = '<tr><th colspan="' + Object.size(this.columns) + '">' + pages + '</th></tr>';
+    this.tbody.append(html);
+    var local = this;
+    this.tbody.find('.go-to-page').click(function() {
+        local.currPage = parseInt($(this).attr('page-number'));
         local.displayData();
         return false;
     });
