@@ -43,7 +43,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         html += '<th>' + column + '</th>';
     }
     html += '</tr>';
-    if (this.columnsToSearch) {
+    if (Object.size(this.columnsToSearch)) {
         html += '<tr>';
         for (var columnName in this.columns) {
             if (typeof(this.columnsToSearch[columnName]) != 'undefined') {
@@ -107,12 +107,10 @@ Cubique.prototype.displayData = function Cubique_displayData()
             } else {
                 local.count = response.count;
                 var html = '';
-                var tdClass = '';
                 for (var rowKey in response.data) {
-                    tdClass = (rowKey%2) ? ' gray' : '';
                     html += '<tr>';
                     for (var columnName in response.data[rowKey]) {
-                        html += '<td class="' + tdClass + '">' + response.data[rowKey][columnName] + '</td>';
+                        html += '<td>' + response.data[rowKey][columnName] + '</td>';
                     }
                     html += '</tr>';
                 }
