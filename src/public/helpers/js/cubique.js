@@ -22,9 +22,13 @@ Cubique = function(options)
     this.currPage        = 1;
     this.sort            = '';
     this.search          = {};
-    this.perPageOptions  = {10:10, 25:25, 50:50, 100:100};
-    if (typeof(this.perPageOptions[this.rowsOnPage]) == 'undefined') {
-        this.perPageOptions[this.rowsOnPage] = this.rowsOnPage;
+    var perPagesArray    = [10, 25, 50, 100];
+    perPagesArray.push(this.rowsOnPage);
+    perPagesArray.sort(function(a,b){return a-b;});
+    perPagesArray.join();
+    this.perPageOptions  = {};
+    for (var i in perPagesArray) {
+        this.perPageOptions[perPagesArray[i]] = perPagesArray[i];
     }
     this.renderGrid();
     this.displayData();
