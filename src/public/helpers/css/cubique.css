@@ -75,9 +75,15 @@ table.cubique a.curr {
 
 table.cubique .in-total {
     float: right;
-    margin-right: 5px;
+    margin-right: 10px;
 }
 
 table.cubique input {
     border: 1px solid #ccc;
+}
+
+table.cubique select.per-page {
+    float: right;
+    height: 18px;
+    font-size: 10px;
 }

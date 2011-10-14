@@ -22,6 +22,10 @@ Cubique = function(options)
     this.currPage        = 1;
     this.sort            = '';
     this.search          = {};
+    this.perPageOptions  = {10:10, 25:25, 50:50, 100:100};
+    if (typeof(this.perPageOptions[this.rowsOnPage]) == 'undefined') {
+        this.perPageOptions[this.rowsOnPage] = this.rowsOnPage;
+    }
     this.renderGrid();
     this.displayData();
 }
@@ -94,10 +98,11 @@ Cubique.prototype.displayData = function Cubique_displayData()
     $.ajax({
         type:     'post',
         data:     {
-            cubique_grid_name:      local.name,
-            cubique_grid_curr_page: local.currPage,
-            cubique_grid_sort:      local.sort,
-            cubique_grid_search:    local.search
+            cubique_grid_name:         local.name,
+            cubique_grid_curr_page:    local.currPage,
+            cubique_grid_sort:         local.sort,
+            cubique_grid_search:       local.search,
+            cubique_grid_rows_on_page: local.rowsOnPage
         },
         url:      location.href,
         dataType: 'json',
@@ -150,12 +155,24 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
     if (pagesCount > to) {
         pages += '...<a href="#" class="go-to-page" page-number="' + pagesCount + '">' + pagesCount + '</a>';
     }
-    var html = '<tr><th colspan="' + Object.size(this.columns) + '">' + pages + '<span class="in-total">' +
+    var select = '<select class="per-page">';
+    for (var i in this.perPageOptions) {
+        select += '<option value="' + this.perPageOptions[i] + '">' + this.perPageOptions[i] + '</option>';
+    }
+    select += '</select>';
+    var html = '<tr><th colspan="' + Object.size(this.columns) + '">' + pages + select + '<span class="in-total">' +
                this.count + ' in total</span></th></tr>';
     this.tbody.append(html);
+    this.tbody.find('.per-page').val(this.rowsOnPage);
     var local = this;
     this.tbody.find('.go-to-page').click(function() {
         local.currPage = parseInt($(this).attr('page-number'));
+        local.displayData();
+        return false;
+    });
+    this.tbody.find('.per-page').change(function() {
+        local.rowsOnPage = $(this).val();
+        local.currPage   = 1;
         local.displayData();
         return false;
     });

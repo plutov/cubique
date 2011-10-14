@@ -187,31 +187,6 @@ class Cubique_Grid
     }
 
     /**
-     * Return HTML and Javascript for grid initialization
-     * @return string
-     */
-    public function __toString()
-    {
-        if (is_null($this->_columns)) {
-            throw new Cubique_Exception('`$columns` can not be empty');
-        }
-        $options = array(
-            'name'              => $this->_name,
-            'columns'           => $this->_columns,
-            'rows_on_page'      => $this->_rowsOnPage,
-            'columns_to_sort'   => $this->_columnsToSort,
-            'columns_to_search' => $this->_columnsToSearch
-        );
-        $optionsJson = Zend_Json_Encoder::encode($options);
-        $html = '<div id="cubique-' . $this->_name . '"></div>' .
-                '<script type="text/javascript">' .
-                '$(document).ready(function(){' .
-                'cubique_' . $this->_name . '=new Cubique(' . $optionsJson . ');' .
-                '});</script>';
-        return $html;
-    }
-
-    /**
      * Return data
      * @param  array $post
      * @return array
@@ -227,11 +202,12 @@ class Cubique_Grid
             $currPage    = intval($post['cubique_grid_curr_page']);
             $sort        = $post['cubique_grid_sort'];
             $search      = $post['cubique_grid_search'];
+            $rowsOnPage  = intval($post['cubique_grid_rows_on_page']);
             $table       = new Zend_Db_Table($this->_table);
             $countSelect = $table->select();
             $select      = $table->select()
                     ->from($this->_table, array_keys($this->_columns))
-                    ->limitPage($table->getAdapter()->quote($currPage), $this->_rowsOnPage);
+                    ->limitPage($table->getAdapter()->quote($currPage), $rowsOnPage);
             if ($sort) {
                 $select->order($sort);
             }
@@ -257,5 +233,30 @@ class Cubique_Grid
             $result['error'] = true;
         }
         return $result;
+    }
+
+    /**
+     * Return HTML and Javascript for grid initialization
+     * @return string
+     */
+    public function __toString()
+    {
+        if (is_null($this->_columns)) {
+            throw new Cubique_Exception('`$columns` can not be empty');
+        }
+        $options = array(
+            'name'              => $this->_name,
+            'columns'           => $this->_columns,
+            'rows_on_page'      => $this->_rowsOnPage,
+            'columns_to_sort'   => $this->_columnsToSort,
+            'columns_to_search' => $this->_columnsToSearch
+        );
+        $optionsJson = Zend_Json_Encoder::encode($options);
+        $html = '<div id="cubique-' . $this->_name . '"></div>' .
+                '<script type="text/javascript">' .
+                '$(document).ready(function(){' .
+                'cubique_' . $this->_name . '=new Cubique(' . $optionsJson . ');' .
+                '});</script>';
+        return $html;
     }
 }
