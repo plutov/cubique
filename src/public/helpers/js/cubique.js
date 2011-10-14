@@ -13,13 +13,15 @@
 Cubique = function(options)
 {
 
-    this.name          = options.name;
-    this.columns       = options.columns;
-    this.rowsOnPage    = options.rows_on_page;
-    this.columnsToSort = options.columns_to_sort;
-    this.count         = 0;
-    this.currPage      = 1;
-    this.sort          = '';
+    this.name            = options.name;
+    this.columns         = options.columns;
+    this.rowsOnPage      = options.rows_on_page;
+    this.columnsToSort   = options.columns_to_sort;
+    this.columnsToSearch = options.columns_to_search;
+    this.count           = 0;
+    this.currPage        = 1;
+    this.sort            = '';
+    this.search          = {};
     this.renderGrid();
     this.displayData();
 }
@@ -30,7 +32,7 @@ Cubique = function(options)
  */
 Cubique.prototype.renderGrid = function Cubique_renderGrid()
 {
-    var html   = '<table class="cubique"><thead>';
+    var html   = '<table class="cubique"><thead><tr>';
     var column = '';
     for (var columnName in this.columns) {
         if (typeof(this.columnsToSort[columnName]) != 'undefined') {
@@ -40,19 +42,39 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         }
         html += '<th>' + column + '</th>';
     }
+    html += '</tr>';
+    if (this.columnsToSearch) {
+        html += '<tr>';
+        for (var columnName in this.columns) {
+            if (typeof(this.columnsToSearch[columnName]) != 'undefined') {
+                column = '<input type="text" search-column="' + columnName + '"/>';
+            } else {
+                column = '';
+            }
+            html += '<th>' + column + '</th>';
+        }
+        html += '</tr>';
+    }
     html += '</thead><tbody></tbody></table>';
     $('#cubique-' + this.name).html(html);
     var sortRotation = 'ASC';
-    var sortColumn = '';
-    var local = this;
+    var sortColumn   = '';
+    var searchColumn = '';
+    var local        = this;
     $('#cubique-' + this.name + ' a.sort-by').click(function() {
         $('#cubique-' + local.name + ' a.sort-by').prev('span').html('');
-        local.currPage = 1;
         sortRotation   = $(this).attr('sort-rotation');
         sortColumn     = $(this).attr('sort-column');
+        local.currPage = 1;
+        local.sort     = sortColumn + ' ' + sortRotation;
         $(this).attr('sort-rotation', sortRotation == 'ASC' ? 'DESC' : 'ASC');
         $(this).prev('span').html(sortRotation == 'ASC' ? '&darr;' : '&uarr;');
-        local.sort = sortColumn + ' ' + sortRotation;
+        local.displayData();
+        return false;
+    });
+    $('#cubique-' + this.name + ' input').keyup(function() {
+        local.search[$(this).attr('search-column')] = $(this).val();
+        local.currPage = 1;
         local.displayData();
         return false;
     });
@@ -74,7 +96,8 @@ Cubique.prototype.displayData = function Cubique_displayData()
         data:     {
             cubique_grid_name:      local.name,
             cubique_grid_curr_page: local.currPage,
-            cubique_grid_sort:      local.sort
+            cubique_grid_sort:      local.sort,
+            cubique_grid_search:    local.search
         },
         url:      location.href,
         dataType: 'json',

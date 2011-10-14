@@ -45,6 +45,12 @@ class Cubique_Grid
     private $_columnsToEscape = array();
 
     /**
+     * Columns names for searching
+     * @var array
+     */
+    private $_columnsToSearch = array();
+
+    /**
      * Constructor
      * @param string $name
      */
@@ -159,6 +165,28 @@ class Cubique_Grid
     }
 
     /**
+     * Set columns for searching
+     * @param  array $columnsToSearch
+     * @return Cubique_Grid
+     */
+    public function setColumnsToSearch($columnsToSearch)
+    {
+        if (!is_array($columnsToSearch)) {
+            throw new Cubique_Exception('Array expected for `$columnsToSearch`');
+        }
+        $columnsToSearch         = array_values($columnsToSearch);
+        $columnsToSearchWithKeys = array();
+        foreach ($columnsToSearch as $columnName) {
+            if (!is_string($columnName)) {
+                throw new Cubique_Exception('String expected for `$columnName`');
+            }
+            $columnsToSearchWithKeys[$columnName] = $columnName;
+        }
+        $this->_columnsToSearch = $columnsToSearchWithKeys;
+        return $this;
+    }
+
+    /**
      * Return HTML and Javascript for grid initialization
      * @return string
      */
@@ -168,10 +196,11 @@ class Cubique_Grid
             throw new Cubique_Exception('`$columns` can not be empty');
         }
         $options = array(
-            'name'            => $this->_name,
-            'columns'         => $this->_columns,
-            'rows_on_page'    => $this->_rowsOnPage,
-            'columns_to_sort' => $this->_columnsToSort
+            'name'              => $this->_name,
+            'columns'           => $this->_columns,
+            'rows_on_page'      => $this->_rowsOnPage,
+            'columns_to_sort'   => $this->_columnsToSort,
+            'columns_to_search' => $this->_columnsToSearch
         );
         $optionsJson = Zend_Json_Encoder::encode($options);
         $html = '<div id="cubique-' . $this->_name . '"></div>' .
@@ -195,14 +224,23 @@ class Cubique_Grid
             'count' => 0
         );
         try {
-            $currPage = intval($post['cubique_grid_curr_page']);
-            $sort     = $post['cubique_grid_sort'];
-            $table    = new Zend_Db_Table($this->_table);
-            $select   = $table->select()
+            $currPage    = intval($post['cubique_grid_curr_page']);
+            $sort        = $post['cubique_grid_sort'];
+            $search      = $post['cubique_grid_search'];
+            $table       = new Zend_Db_Table($this->_table);
+            $countSelect = $table->select();
+            $select      = $table->select()
                     ->from($this->_table, array_keys($this->_columns))
-                    ->limitPage($currPage, $this->_rowsOnPage);
+                    ->limitPage($table->getAdapter()->quote($currPage), $this->_rowsOnPage);
             if ($sort) {
                 $select->order($sort);
+            }
+            if ($search) {
+                foreach ($search as $searchColumn => $searchValue) {
+                    $where = $table->getAdapter()->quoteInto($searchColumn . ' LIKE ?', '%' . $searchValue . '%');
+                    $select->where($where);
+                    $countSelect->where($where);
+                }
             }
             $data = $table->fetchAll($select)->toArray();
             if (count($this->_columnsToEscape)) {
@@ -214,7 +252,7 @@ class Cubique_Grid
                 }
             }
             $result['data'] = $data;
-            $result['count'] = $table->fetchAll($table->select())->count();
+            $result['count'] = $table->fetchAll($countSelect)->count();
         } catch (Exception $e) {
             $result['error'] = true;
         }
