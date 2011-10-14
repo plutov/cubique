@@ -34,7 +34,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     var column = '';
     for (var columnName in this.columns) {
         if (typeof(this.columnsToSort[columnName]) != 'undefined') {
-            column = '<a href="#" class="sort-by" sort-column="' + columnName + '" sort-rotation="ASC">' + this.columns[columnName] + '</a>';
+            column = '<span></span> <a href="#" class="sort-by" sort-column="' + columnName + '" sort-rotation="ASC">' + this.columns[columnName] + '</a>';
         } else {
             column = this.columns[columnName];
         }
@@ -43,12 +43,16 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     html += '</thead><tbody></tbody></table>';
     $('#cubique-' + this.name).html(html);
     var sortRotation = 'ASC';
+    var sortColumn = '';
     var local = this;
     $('#cubique-' + this.name + ' a.sort-by').click(function() {
+        $('#cubique-' + local.name + ' a.sort-by').prev('span').html('');
         local.currPage = 1;
-        sortRotation = $(this).attr('sort-rotation');
+        sortRotation   = $(this).attr('sort-rotation');
+        sortColumn     = $(this).attr('sort-column');
         $(this).attr('sort-rotation', sortRotation == 'ASC' ? 'DESC' : 'ASC');
-        local.sort = $(this).attr('sort-column') + ' ' + sortRotation;
+        $(this).prev('span').html(sortRotation == 'ASC' ? '&darr;' : '&uarr;');
+        local.sort = sortColumn + ' ' + sortRotation;
         local.displayData();
         return false;
     });
