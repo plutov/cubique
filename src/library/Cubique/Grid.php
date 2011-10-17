@@ -118,6 +118,9 @@ class Cubique_Grid
         if (!is_int($rowsOnPage)) {
             throw new Cubique_Exception('Int expected for `$rowsOnPage`');
         }
+        if ($rowsOnPage <= 0) {
+            throw new Cubique_Exception('Invalid value for `$rowsOnPage`');
+        }
         $this->_rowsOnPage = $rowsOnPage;
         return $this;
     }
