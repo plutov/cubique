@@ -41,17 +41,12 @@ table.cubique td {
 }
 
 table.cubique td.loading {
-    height: 50px;
-    position: relative;
+    height: 51px;
+    text-align: center;
 }
 
 table.cubique td.loading img {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    top: 50%;
-    left: 50%;
-    margin: -8px 0px 0px -8px;
+    margin-top: 18px;
 }
 
 table.cubique a.go-to-page {
