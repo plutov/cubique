@@ -5,8 +5,7 @@
  * @license   https://github.com/plutov/cubique/wiki/License
  */
 
-table.cubique, table.cubique tbody, table.cubique tfoot, table.cubique thead, table.cubique tr, table.cubique th,
-table.cubique td {
+table.cubique, table.cubique tbody, table.cubique thead, table.cubique tr, table.cubique th, table.cubique td {
     margin: 0px;
     padding: 0px;
     border: 0px;
@@ -14,69 +13,58 @@ table.cubique td {
     font-size: 14px;
     vertical-align: baseline;
     background: transparent;
+    color: #333;
 }
 table.cubique {
     width: 100%;
     border-collapse: collapse;
 }
-
 table.cubique th, table.cubique td {
-    font-weight: bold;
     border: 1px solid #d5d5d5;
-    background: #e5e5e5;
     padding: 2px;
-    color: #54a3c4;
     text-align: left;
 }
-
-table.cubique th a.sort-by {
+table.cubique th {
+    font-weight: bold;
+    color: #54a3c4;
+    background: #e5e5e5;
+}
+table.cubique th a.sort-by, table.cubique a.go-to-page {
     color: #54a3c4;
     text-decoration: none;
 }
-
 table.cubique td {
     background: #f6f6f6;
-    color: #000;
-    font-weight: normal;
 }
-
 table.cubique td.loading {
     height: 51px;
     text-align: center;
 }
-
 table.cubique td.loading img {
     margin-top: 18px;
 }
-
 table.cubique a.go-to-page {
     background: #fff;
-    color: #333;
     font-weight: normal;
     margin: 0px 3px;
-    text-decoration: none;
     padding: 0px 5px;
     font-size: 12px;
 }
-
 table.cubique a.go-to-page:hover {
     background: #333;
     color: #fff;
 }
-
 table.cubique a.curr {
     background: #54a3c4;
+    color: #333;
 }
-
 table.cubique .in-total {
     float: right;
     margin-right: 10px;
 }
-
 table.cubique input {
     border: 1px solid #ccc;
 }
-
 table.cubique select.per-page {
     float: right;
     height: 18px;
