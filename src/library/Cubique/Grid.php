@@ -138,6 +138,9 @@ class Cubique_Grid
             if (!is_string($columnName)) {
                 throw new Cubique_Exception('String expected for `$columnName`');
             }
+            if (!array_key_exists($columnName, $this->_columns)) {
+                throw new Cubique_Exception('Column not found');
+            }
             $columnsToSortWithKeys[$columnName] = $columnName;
         }
         $this->_columnsToSort = $columnsToSortWithKeys;
@@ -159,6 +162,9 @@ class Cubique_Grid
             if (!is_string($columnName)) {
                 throw new Cubique_Exception('String expected for `$columnName`');
             }
+            if (!array_key_exists($columnName, $this->_columns)) {
+                throw new Cubique_Exception('Column not found');
+            }
         }
         $this->_columnsToEscape = $columnsToEscape;
         return $this;
@@ -179,6 +185,9 @@ class Cubique_Grid
         foreach ($columnsToSearch as $columnName) {
             if (!is_string($columnName)) {
                 throw new Cubique_Exception('String expected for `$columnName`');
+            }
+            if (!array_key_exists($columnName, $this->_columns)) {
+                throw new Cubique_Exception('Column not found');
             }
             $columnsToSearchWithKeys[$columnName] = $columnName;
         }
@@ -241,9 +250,6 @@ class Cubique_Grid
      */
     public function __toString()
     {
-        if (is_null($this->_columns)) {
-            throw new Cubique_Exception('`$columns` can not be empty');
-        }
         $options = array(
             'name'              => $this->_name,
             'columns'           => $this->_columns,
