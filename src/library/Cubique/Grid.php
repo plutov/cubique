@@ -254,11 +254,11 @@ class Cubique_Grid
     public function __toString()
     {
         $options = array(
-            'name'              => $this->_name,
-            'columns'           => $this->_columns,
-            'rows_on_page'      => $this->_rowsOnPage,
-            'columns_to_sort'   => $this->_columnsToSort,
-            'columns_to_search' => $this->_columnsToSearch
+            'name'            => $this->_name,
+            'columns'         => $this->_columns,
+            'rowsOnPage'      => $this->_rowsOnPage,
+            'columnsToSort'   => $this->_columnsToSort,
+            'columnsToSearch' => $this->_columnsToSearch
         );
         $optionsJson = Zend_Json_Encoder::encode($options);
         $html = '<div id="cubique-' . $this->_name . '"></div>' .
