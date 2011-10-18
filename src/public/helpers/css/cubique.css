@@ -33,6 +33,9 @@ table.cubique th a.sort-by, table.cubique a.go-to-page {
     color: #54a3c4;
     text-decoration: none;
 }
+table.cubique tbody td:hover {
+    background: #fff;
+}
 table.cubique td {
     background: #f6f6f6;
 }
