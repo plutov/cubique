@@ -51,6 +51,12 @@ class Cubique_Grid
     private $_columnsToSearch = array();
 
     /**
+     * URL for AJAX request
+     * @var string
+     */
+    private $_url;
+
+    /**
      * Constructor
      * @param string $name
      */
@@ -199,6 +205,20 @@ class Cubique_Grid
     }
 
     /**
+     * Set URL for AJAX request
+     * @param string $url
+     * @return Cubique_Grid
+     */
+    public function setUrl($url)
+    {
+        if (!is_string($url)) {
+            throw new Cubique_Exception('String expected for `$url`');
+        }
+        $this->_url = $url;
+        return $this;
+    }
+
+    /**
      * Return data
      * @param  array $post
      * @return array
@@ -258,7 +278,8 @@ class Cubique_Grid
             'columns'         => $this->_columns,
             'rowsOnPage'      => $this->_rowsOnPage,
             'columnsToSort'   => $this->_columnsToSort,
-            'columnsToSearch' => $this->_columnsToSearch
+            'columnsToSearch' => $this->_columnsToSearch,
+            'url'             => $this->_url
         );
         $optionsJson = Zend_Json_Encoder::encode($options);
         $html = '<div id="cubique-' . $this->_name . '"></div>' .

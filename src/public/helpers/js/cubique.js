@@ -104,7 +104,7 @@ Cubique.prototype.showData = function Cubique_showData()
             cubique_grid_search:       local.search,
             cubique_grid_rows_on_page: local.rowsOnPage
         },
-        url: location.href,
+        url: local.url ? local.url : location.href,
         dataType: 'json',
         success:  function(response) {
             if (response.error) {
