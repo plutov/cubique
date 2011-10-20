@@ -27,6 +27,12 @@ class Cubique_Grid
     private $_columns;
 
     /**
+     * Default order
+     * @var string
+     */
+    private $_defaultOrder;
+
+    /**
      * Number of displayed rows on page
      * @var int
      */
@@ -111,6 +117,20 @@ class Cubique_Grid
             }
             $this->_columns = $columns;
         }
+        return $this;
+    }
+
+    /**
+     * Set default order
+     * @param string $order
+     * @return Cubique_Grid
+     */
+    public function setDefaultOrder($order)
+    {
+        if (!is_string($order)) {
+            throw new Cubique_Exception('String expected for `$order`');
+        }
+        $this->_defaultOrder = $order;
         return $this;
     }
 
@@ -242,6 +262,8 @@ class Cubique_Grid
                     ->limitPage($table->getAdapter()->quote($currPage), $rowsOnPage);
             if ($sort) {
                 $select->order($sort);
+            } elseif ($this->_defaultOrder) {
+                $select->order($this->_defaultOrder);
             }
             if ($search) {
                 foreach ($search as $searchColumn => $searchValue) {
@@ -259,7 +281,7 @@ class Cubique_Grid
                     }
                 }
             }
-            $result['data'] = $data;
+            $result['data']  = $data;
             $result['count'] = $table->fetchAll($countSelect)->count();
         } catch (Exception $e) {
             $result['error'] = true;
