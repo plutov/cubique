@@ -8,56 +8,46 @@
 class Cubique_Grid
 {
     /**
-     * Grid name
-     * Should be unique for grids displayed on one page
      * @var string
      */
     private $_name;
 
     /**
-     * Table name
      * @var string
      */
     private $_table;
 
     /**
-     * Displayed columns
      * @var array
      */
     private $_columns;
 
     /**
-     * Default order
      * @var string
      */
     private $_defaultOrder;
 
     /**
-     * Number of displayed rows on page
      * @var int
      */
     private $_rowsOnPage = 10;
 
     /**
-     * Columns names for which sorting is available
      * @var array
      */
     private $_columnsToSort = array();
 
     /**
-     * Columns names for escaping
      * @var array
      */
     private $_columnsToEscape = array();
 
     /**
-     * Columns names for searching
      * @var array
      */
     private $_columnsToSearch = array();
 
     /**
-     * URL for AJAX request
      * @var string
      */
     private $_url;
