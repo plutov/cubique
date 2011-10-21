@@ -63,7 +63,7 @@ class Cubique_Grid
     private $_url;
 
     /**
-     * Constructor
+     * Sets name of the grid. Name should be a unique string with only letters and numbers.
      * @param string $name
      */
     public function __construct($name)
@@ -82,9 +82,8 @@ class Cubique_Grid
     }
 
     /**
-     * Set table name and primary column
+     * Sets table name for getting data.
      * @param  string $table
-     * @param  string $primary
      * @return Cubique_Grid
      */
     public function setTable($table)
@@ -97,7 +96,7 @@ class Cubique_Grid
     }
 
     /**
-     * Set displayed columns
+     * Sets displayed columns. Array format: columnName => columnLabel.
      * @param  array $columns
      * @return Cubique_Grid
      */
@@ -121,7 +120,7 @@ class Cubique_Grid
     }
 
     /**
-     * Set default order
+     * Sets default order rule.
      * @param string $order
      * @return Cubique_Grid
      */
@@ -135,7 +134,7 @@ class Cubique_Grid
     }
 
     /**
-     * Set number of displayed rows on page
+     * Sets default number of items per page.
      * @param  int $rowsOnPage
      * @return void
      */
@@ -152,7 +151,8 @@ class Cubique_Grid
     }
 
     /**
-     * Set columns for which sorting is available
+     * Sets columns, for which sorting will be available.
+     * Column should be added using setColumns before calling this method.
      * @param  array $columnsToSort
      * @return Cubique_Grid
      */
@@ -177,7 +177,8 @@ class Cubique_Grid
     }
 
     /**
-     * Set columns for escaping
+     * Sets columns, for which values will be escaped.
+     * Columns should be added using setColumns before calling this method.
      * @param  array $columnsToEscape
      * @return Cubique_Grid
      */
@@ -200,7 +201,8 @@ class Cubique_Grid
     }
 
     /**
-     * Set columns for searching
+     * Sets columns, for which searching will be available.
+     * Columns should be added using setColumns before calling this method.
      * @param  array $columnsToSearch
      * @return Cubique_Grid
      */
@@ -225,7 +227,7 @@ class Cubique_Grid
     }
 
     /**
-     * Set URL for AJAX request
+     * Sets URL for AJAX requests.
      * @param string $url
      * @return Cubique_Grid
      */
@@ -239,7 +241,8 @@ class Cubique_Grid
     }
 
     /**
-     * Return data
+     * Returns data from the table using current grid settings.
+     * Result format: 'error' => bool, 'data' => array, 'count' => 0
      * @param  array $post
      * @return array
      */
@@ -290,7 +293,7 @@ class Cubique_Grid
     }
 
     /**
-     * Return HTML and Javascript for grid initialization
+     * Return HTML and Javascript for grid initialization.
      * @return string
      */
     public function __toString()
