@@ -120,6 +120,12 @@ Cubique.prototype.showData = function Cubique_showData()
                     html += '</tr>';
                 }
                 local.tbody.html(html);
+                $('table.cubique tbody td').mouseover(function() {
+                    $(this).parent().addClass('hovered');
+                })
+                .mouseleave(function() {
+                    $(this).parent().removeClass('hovered');
+                });
                 local.renderPagesSection();
             }
             loading.remove();
