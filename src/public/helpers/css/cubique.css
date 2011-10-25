@@ -24,6 +24,9 @@ table.cubique th, table.cubique td {
     padding: 2px;
     text-align: left;
 }
+table.cubique td.error {
+    text-align:  center;
+}
 table.cubique th {
     font-weight: bold;
     color: #54a3c4;

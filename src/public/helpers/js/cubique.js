@@ -91,8 +91,9 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
  */
 Cubique.prototype.showData = function Cubique_showData()
 {
-    var loading = $('<tr><td colspan="' + Object.size(this.columns) + '" class="loading">' +
-                    '<img src="/helpers/img/cubique_loading.gif"/></td></tr>');
+    var columnsCount = Object.size(this.columns);
+    var loading      = $('<tr><td colspan="' + columnsCount + '" class="loading">' +
+                       '<img src="/helpers/img/cubique_loading.gif"/></td></tr>');
     this.tbody.html(loading);
     var local = this;
     $.ajax({
@@ -108,7 +109,8 @@ Cubique.prototype.showData = function Cubique_showData()
         dataType: 'json',
         success:  function(response) {
             if (response.error) {
-                alert('Error has been occurred. Try to refresh the page.');
+                local.tbody.html('<tr><td colspan="' + columnsCount + '" class="error">' +
+                                 'Error has been occurred. Try to refresh the page.</td></tr>');
             } else {
                 local.count = response.count;
                 var html = '';
