@@ -179,20 +179,23 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         select += '<option value="' + this.perPageOptions[i] + '">' + this.perPageOptions[i] + '</option>';
     }
     select += '</select>';
-    var html = '<tr><th colspan="' + Object.size(this.columns) + '">' + pages + select + '<span class="in-total">' +
-               this.count + ' in total</span></th></tr>';
-    this.tbody.append(html);
-    this.tbody.find('.per-page').val(this.rowsOnPage);
+    var html = $('<tr><th colspan="' + Object.size(this.columns) + '">' + pages + select + '<span class="in-total">' +
+               this.count + ' in total</span></th></tr>');
+    var thead = this.tbody.prev('thead');
+    thead.append(html);
+    thead.find('.per-page').val(this.rowsOnPage);
     var local = this;
-    this.tbody.find('.go-to-page').click(function() {
+    thead.find('.go-to-page').click(function() {
         local.currPage = parseInt($(this).attr('page-number'));
         local.showData();
+        html.remove();
         return false;
     });
-    this.tbody.find('.per-page').change(function() {
+    thead.find('.per-page').change(function() {
         local.rowsOnPage = $(this).val();
         local.currPage   = 1;
         local.showData();
+        html.remove();
         return false;
     });
 }

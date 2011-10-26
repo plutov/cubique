@@ -143,77 +143,63 @@ class Cubique_Grid
     /**
      * Sets columns, for which sorting will be available.
      * Column should be added using setColumns before calling this method.
-     * @param  array $columnsToSort
+     * @param  array $columns
      * @return Cubique_Grid
      */
-    public function setColumnsToSort($columnsToSort)
+    public function setColumnsToSort($columns)
     {
-        if (!is_array($columnsToSort)) {
-            throw new Cubique_Exception('Array expected for `$columnsToSort`');
-        }
-        $columnsToSort         = array_values($columnsToSort);
-        $columnsToSortWithKeys = array();
-        foreach ($columnsToSort as $columnName) {
-            if (!is_string($columnName)) {
-                throw new Cubique_Exception('String expected for `$columnName`');
-            }
-            if (!array_key_exists($columnName, $this->_columns)) {
-                throw new Cubique_Exception('Column not found');
-            }
-            $columnsToSortWithKeys[$columnName] = $columnName;
-        }
-        $this->_columnsToSort = $columnsToSortWithKeys;
+        $this->_checkColumnsExistAndStrings($columns);
+        $values = array_values($columns);
+        $this->_columnsToSort = array_combine($values, $values);
         return $this;
     }
 
     /**
      * Sets columns, for which values will be escaped.
      * Columns should be added using setColumns before calling this method.
-     * @param  array $columnsToEscape
+     * @param  array $columns
      * @return Cubique_Grid
      */
-    public function setColumnsToEscape($columnsToEscape)
+    public function setColumnsToEscape($columns)
     {
-        if (!is_array($columnsToEscape)) {
-            throw new Cubique_Exception('Array expected for `$columnsToEscape`');
-        }
-        $columnsToEscape = array_values($columnsToEscape);
-        foreach ($columnsToEscape as $columnName) {
-            if (!is_string($columnName)) {
-                throw new Cubique_Exception('String expected for `$columnName`');
-            }
-            if (!array_key_exists($columnName, $this->_columns)) {
-                throw new Cubique_Exception('Column not found');
-            }
-        }
-        $this->_columnsToEscape = $columnsToEscape;
+        $this->_checkColumnsExistAndStrings($columns);
+        $values = array_values($columns);
+        $this->_columnsToEscape = array_combine($values, $values);
         return $this;
     }
 
     /**
      * Sets columns, for which searching will be available.
      * Columns should be added using setColumns before calling this method.
-     * @param  array $columnsToSearch
+     * @param  array $columns
      * @return Cubique_Grid
      */
-    public function setColumnsToSearch($columnsToSearch)
+    public function setColumnsToSearch($columns)
     {
-        if (!is_array($columnsToSearch)) {
-            throw new Cubique_Exception('Array expected for `$columnsToSearch`');
+        $this->_checkColumnsExistAndStrings($columns);
+        $values = array_values($columns);
+        $this->_columnsToSearch = array_combine($values, $values);
+        return $this;
+    }
+
+    /**
+     * Checks if columns exist and have string type
+     * @param  mixed $columns
+     * @return void
+     */
+    private function _checkColumnsExistAndStrings($columns)
+    {
+        if (!is_array($columns)) {
+            throw new Cubique_Exception('Array expected for `$columns`');
         }
-        $columnsToSearch         = array_values($columnsToSearch);
-        $columnsToSearchWithKeys = array();
-        foreach ($columnsToSearch as $columnName) {
-            if (!is_string($columnName)) {
-                throw new Cubique_Exception('String expected for `$columnName`');
+        foreach ($columns as $column) {
+            if (!is_string($column)) {
+                throw new Cubique_Exception('String expected for `$column`');
             }
-            if (!array_key_exists($columnName, $this->_columns)) {
+            if (!array_key_exists($column, $this->_columns)) {
                 throw new Cubique_Exception('Column not found');
             }
-            $columnsToSearchWithKeys[$columnName] = $columnName;
         }
-        $this->_columnsToSearch = $columnsToSearchWithKeys;
-        return $this;
     }
 
     /**
@@ -238,11 +224,6 @@ class Cubique_Grid
      */
     public function getData($post)
     {
-        $result = array(
-            'error' => false,
-            'data'  => array(),
-            'count' => 0
-        );
         try {
             $currPage    = intval($post['cubique_grid_curr_page']);
             $sort        = $post['cubique_grid_sort'];
@@ -266,20 +247,23 @@ class Cubique_Grid
                 }
             }
             $data = $table->fetchAll($select)->toArray();
-            if (count($this->_columnsToEscape)) {
+            if ($this->_columnsToEscape) {
                 $view = new Zend_View();
                 foreach ($data as &$row) {
                     foreach ($this->_columnsToEscape as $escapeColumn) {
                         $row[$escapeColumn] = $view->escape($row[$escapeColumn]);
                     }
                 }
+                unset($row);
             }
-            $result['data']  = $data;
-            $result['count'] = $table->fetchAll($countSelect)->count();
+            return array(
+                'data'  => $data,
+                'count' => $table->fetchAll($countSelect)->count(),
+                'error' => false
+            );
         } catch (Exception $e) {
-            $result['error'] = true;
+            return array('error' => true);
         }
-        return $result;
     }
 
     /**
@@ -288,20 +272,15 @@ class Cubique_Grid
      */
     public function __toString()
     {
-        $options = array(
+        $options = Zend_Json_Encoder::encode(array(
             'name'            => $this->_name,
             'columns'         => $this->_columns,
             'rowsOnPage'      => $this->_rowsOnPage,
             'columnsToSort'   => $this->_columnsToSort,
             'columnsToSearch' => $this->_columnsToSearch,
             'url'             => $this->_url
-        );
-        $optionsJson = Zend_Json_Encoder::encode($options);
-        $html = '<div id="cubique-' . $this->_name . '"></div>' .
-                '<script type="text/javascript">' .
-                '$(document).ready(function(){' .
-                'cubique_' . $this->_name . '=new Cubique(' . $optionsJson . ');' .
-                '});</script>';
-        return $html;
+        ));
+        return '<div id="cubique-' . $this->_name . '"></div><script type="text/javascript">$(document).ready(
+               function(){cubique_' . $this->_name . '=new Cubique(' . $options . ');});</script>';
     }
 }
