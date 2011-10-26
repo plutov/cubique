@@ -183,7 +183,7 @@ class Cubique_Grid
     }
 
     /**
-     * Checks if columns exist and have string type
+     * Checks if columns exist and have string type. Throws an exception for error.
      * @param  mixed $columns
      * @return void
      */
