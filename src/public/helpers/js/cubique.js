@@ -52,7 +52,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         html += '<tr>';
         for (var j in this.columns) {
             if (typeof(this.columnsToSearch[j]) != 'undefined') {
-                column = '<input type="text" search-column="' + j + '"/>';
+                column = '<input type="text" search-column="' + j + '" placeholder="search"/>';
             } else {
                 column = '';
             }
