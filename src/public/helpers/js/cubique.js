@@ -15,17 +15,21 @@ Cubique = function(options)
     for (var i in options) {
         this[i] = options[i];
     }
-    if (isLocalStorageAvailable()) {
-        var rowsOnPageLS = localStorage.getItem(this.name + '_rowsOnPage');
-        if (rowsOnPageLS) {
-            this.rowsOnPage = rowsOnPageLS;
-        }
-    }
     this.count          = 0;
     this.currPage       = 1;
     this.sort           = '';
     this.search         = {};
     var perPagesOptions = [10, 25, 50, 100];
+    if (isLocalStorageAvailable()) {
+        var rowsOnPageLS = localStorage.getItem(this.name + '_rowsOnPage');
+        var currPageLS   = localStorage.getItem(this.name + '_currPage');
+        if (rowsOnPageLS) {
+            this.rowsOnPage = rowsOnPageLS;
+            if (currPageLS) {
+                this.currPage = currPageLS;
+            }
+        }
+    }
     perPagesOptions.push(this.rowsOnPage);
     perPagesOptions.sort(function(a,b){return a-b;});
     perPagesOptions.join();
@@ -194,6 +198,9 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
     var local = this;
     thead.find('.go-to-page').click(function() {
         local.currPage = parseInt($(this).attr('page-number'));
+        if (isLocalStorageAvailable()) {
+            localStorage.setItem(local.name + '_currPage', local.currPage);
+        }
         local.showData();
         html.remove();
         return false;
@@ -202,6 +209,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         local.rowsOnPage = $(this).val();
         if (isLocalStorageAvailable()) {
             localStorage.setItem(local.name + '_rowsOnPage', local.rowsOnPage);
+            localStorage.setItem(local.name + '_currPage', 1);
         }
         local.currPage   = 1;
         local.showData();
