@@ -25,9 +25,9 @@ Cubique = function(options)
         var currPageLS   = localStorage.getItem(this.name + '_currPage');
         if (rowsOnPageLS) {
             this.rowsOnPage = rowsOnPageLS;
-            if (currPageLS) {
-                this.currPage = currPageLS;
-            }
+        }
+        if (currPageLS) {
+            this.currPage = currPageLS;
         }
     }
     perPagesOptions.push(this.rowsOnPage);
@@ -138,6 +138,7 @@ Cubique.prototype.showData = function Cubique_showData()
                 .mouseleave(function() {
                     $(this).parent().removeClass('hovered');
                 });
+                local.tbody.prev('thead').find('.pages').remove();
                 local.renderPagesSection();
             }
             loading.remove();
@@ -191,7 +192,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         select += '<option value="' + this.perPageOptions[i] + '">' + this.perPageOptions[i] + '</option>';
     }
     select += '</select>';
-    var html = $('<tr><th colspan="' + Object.size(this.columns) + '">' + pages + select + '<span class="in-total">' +
+    var html = $('<tr class="pages"><th colspan="' + Object.size(this.columns) + '">' + pages + select + '<span class="in-total">' +
                this.count + ' in total</span></th></tr>');
     var thead = this.tbody.prev('thead');
     thead.append(html);
@@ -202,7 +203,6 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
             localStorage.setItem(local.name + '_currPage', local.currPage);
         }
         local.showData();
-        html.remove();
         return false;
     });
     thead.find('.per-page').change(function() {
@@ -213,7 +213,6 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         }
         local.currPage   = 1;
         local.showData();
-        html.remove();
         return false;
     }).val(this.rowsOnPage);
 }
