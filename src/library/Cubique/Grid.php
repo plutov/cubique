@@ -53,6 +53,11 @@ class Cubique_Grid
     private $_url;
 
     /**
+     * @var array
+     */
+    private $_joins = array();
+
+    /**
      * Sets name of the grid. Name should be a unique string with only letters and numbers.
      * @param string $name
      */
@@ -217,6 +222,40 @@ class Cubique_Grid
     }
 
     /**
+     * Sets JOIN statement for column.
+     * @param  string $column
+     * @param  string $joinTable
+     * @param  string $conditionColumn
+     * @param  string $conditionJoinColumn
+     * @param  string $selectColumn
+     * @return Cubique_Grid
+     */
+    public function setJoin($column, $joinTable, $conditionColumn, $conditionJoinColumn, $selectColumn)
+    {
+        $columns = array($column);
+        $this->_checkColumnsExistAndStrings($columns);
+        if (!is_string($joinTable)) {
+            throw new Cubique_Exception('String expected for `$joinTable`');
+        }
+        if (!is_string($conditionColumn)) {
+            throw new Cubique_Exception('String expected for `$conditionColumn`');
+        }
+        if (!is_string($conditionJoinColumn)) {
+            throw new Cubique_Exception('String expected for `$conditionJoinColumn`');
+        }
+        if (!is_string($selectColumn)) {
+            throw new Cubique_Exception('String expected for `$selectColumn`');
+        }
+        $this->_joins[$column] = array(
+            'join_table'            => $joinTable,
+            'condition_column'      => $conditionColumn,
+            'condition_join_column' => $conditionJoinColumn,
+            'select_column'         => $selectColumn
+        );
+        return $this;
+    }
+
+    /**
      * Returns data from the table using current grid settings.
      * Result format: 'error' => bool, 'data' => array, 'count' => 0
      * @param  array $post
@@ -231,9 +270,27 @@ class Cubique_Grid
             $rowsOnPage  = intval($post['cubique_grid_rows_on_page']);
             $table       = new Zend_Db_Table($this->_table);
             $countSelect = $table->select();
-            $select      = $table->select()
-                    ->from($this->_table, array_keys($this->_columns))
+            $columns     = $this->_columns;
+            if (count($this->_joins)) {
+                foreach ($this->_joins as $column => $join) {
+                    unset($columns[$column]);
+                }
+            }
+            $columns = array_keys($columns);
+            $select = $table->select()
+                    ->from($this->_table, $columns)
                     ->limitPage($table->getAdapter()->quote($currPage), $rowsOnPage);
+            if (count($this->_joins)) {
+                $countSelect->setIntegrityCheck(false);
+                $select->setIntegrityCheck(false);
+                foreach ($this->_joins as $column => $join) {
+                    $joinTable     = $join['join_table'];
+                    $joinSelect    = array($column => $join['select_column']);
+                    $joinCondition = $join['join_table'] . '.' . $join['condition_join_column'] . '=' .
+                        $this->_table . '.' . $join['condition_column'];
+                    $select->joinLeft($joinTable, $joinCondition, $joinSelect);
+                }
+            }
             if ($sort) {
                 $select->order($sort);
             } elseif ($this->_defaultOrder) {
@@ -241,6 +298,10 @@ class Cubique_Grid
             }
             if ($search) {
                 foreach ($search as $searchColumn => $searchValue) {
+                    if (array_key_exists($searchColumn, $this->_joins)) {
+                        $searchColumn = $this->_joins[$searchColumn]['join_table'] . '.' .
+                                        $this->_joins[$searchColumn]['select_column'];
+                    }
                     $where = $table->getAdapter()->quoteInto($searchColumn . ' LIKE ?', '%' . $searchValue . '%');
                     $select->where($where);
                     $countSelect->where($where);
