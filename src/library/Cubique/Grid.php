@@ -313,16 +313,19 @@ class Cubique_Grid
                     $countSelect->where($where);
                 }
             }
-            $data = $table->fetchAll($select)->toArray();
-            if ($this->_columnsToEscape) {
-                $view = new Zend_View();
-                foreach ($data as &$row) {
-                    foreach ($this->_columnsToEscape as $escapeColumn) {
-                        $row[$escapeColumn] = $view->escape($row[$escapeColumn]);
+            $result  = $table->fetchAll($select)->toArray();
+            $view    = new Zend_View();
+            $data    = array();
+            $columns = array_keys($this->_columns);
+            foreach ($result as $key => &$row) {
+                foreach ($columns as $column) {
+                    if (in_array($column, $this->_columnsToEscape)) {
+                        $row[$column] = $view->escape($row[$column]);
                     }
+                    $data[$key][$column] = $row[$column];
                 }
-                unset($row);
             }
+            unset($row);
             return array(
                 'data'  => $data,
                 'count' => $table->fetchAll($countSelect)->count(),
