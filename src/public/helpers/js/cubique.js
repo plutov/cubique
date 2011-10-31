@@ -127,6 +127,9 @@ Cubique.prototype.showData = function Cubique_showData()
                 for (var rowKey in response.data) {
                     html += '<tr>';
                     for (var columnName in response.data[rowKey]) {
+                        if (null == response.data[rowKey][columnName]) {
+                            response.data[rowKey][columnName] = '';
+                        }
                         html += '<td>' + response.data[rowKey][columnName] + '</td>';
                     }
                     html += '</tr>';

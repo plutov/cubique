@@ -302,7 +302,7 @@ class Cubique_Grid
                         $searchColumn = $this->_joins[$searchColumn]['join_table'] . '.' .
                                         $this->_joins[$searchColumn]['select_column'];
                     }
-                    $where = $table->getAdapter()->quoteInto($searchColumn . ' LIKE ?', '%' . $searchValue . '%');
+                    $where = $table->getAdapter()->quoteInto($this->_table . '.' . $searchColumn . ' LIKE ?', '%' . $searchValue . '%');
                     $select->where($where);
                     $countSelect->where($where);
                 }
