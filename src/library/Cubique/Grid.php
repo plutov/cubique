@@ -269,7 +269,6 @@ class Cubique_Grid
             $search      = $post['cubique_grid_search'];
             $rowsOnPage  = intval($post['cubique_grid_rows_on_page']);
             $table       = new Zend_Db_Table($this->_table);
-            $countSelect = $table->select();
             $columns     = $this->_columns;
             if (count($this->_joins)) {
                 foreach ($this->_joins as $column => $join) {
@@ -277,6 +276,7 @@ class Cubique_Grid
                 }
             }
             $columns = array_keys($columns);
+            $countSelect = $table->select()->from($this->_table, array($columns[0]));
             $select = $table->select()
                     ->from($this->_table, $columns)
                     ->limitPage($table->getAdapter()->quote($currPage), $rowsOnPage);
@@ -289,6 +289,7 @@ class Cubique_Grid
                     $joinCondition = $join['join_table'] . '.' . $join['condition_join_column'] . '=' .
                         $this->_table . '.' . $join['condition_column'];
                     $select->joinLeft($joinTable, $joinCondition, $joinSelect);
+                    $countSelect->joinLeft($joinTable, $joinCondition, $joinSelect);
                 }
             }
             if ($sort) {
@@ -298,11 +299,16 @@ class Cubique_Grid
             }
             if ($search) {
                 foreach ($search as $searchColumn => $searchValue) {
-                    if (array_key_exists($searchColumn, $this->_joins)) {
-                        $searchColumn = $this->_joins[$searchColumn]['join_table'] . '.' .
-                                        $this->_joins[$searchColumn]['select_column'];
+                    if (!$searchValue) {
+                        continue;
                     }
-                    $where = $table->getAdapter()->quoteInto($this->_table . '.' . $searchColumn . ' LIKE ?', '%' . $searchValue . '%');
+                    if (array_key_exists($searchColumn, $this->_joins)) {
+                        $searchColumn = '`' . $this->_joins[$searchColumn]['join_table'] . '`.`' .
+                                        $this->_joins[$searchColumn]['select_column'] . '`';
+                    } else {
+                        $searchColumn = '`' . $this->_table . '`.`' . $searchColumn . '`';
+                    }
+                    $where = $table->getAdapter()->quoteInto($searchColumn . ' LIKE ?', '%' . $searchValue . '%');
                     $select->where($where);
                     $countSelect->where($where);
                 }
