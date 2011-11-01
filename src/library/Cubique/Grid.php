@@ -355,8 +355,7 @@ class Cubique_Grid
             );
         } catch (Exception $e) {
             if ($this->_logFile) {
-                $f = fopen($this->_logFile, 'w');
-                fputs($f, Zend_Date::now()->get(Zend_Date::DATETIME_SHORT) . ': ' . $e->getMessage() . "\n");
+                file_put_contents($this->_logFile, Zend_Date::now()->get(Zend_Date::DATETIME_MEDIUM) . ': ' . $e->getMessage() . "\n", FILE_APPEND);
             }
             return array('error' => true);
         }
