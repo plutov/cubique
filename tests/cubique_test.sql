@@ -1,28 +1,16 @@
-﻿-- Скрипт сгенерирован Devart dbForge Studio for MySQL, Версия 3.60.351.1
--- Дата: 01.11.2011 9:54:41
--- Версия сервера: 5.1.42-community
--- Версия клиента: 4.1
-
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS = 0 */;
+﻿/*!40014 SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS = 0 */;
 
 SET NAMES 'utf8';
---
--- Описание для базы данных cubique_test
---
+
 CREATE DATABASE cubique_test
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
 
 USE cubique_test;
 
---
--- Описание для таблицы country
---
 CREATE TABLE country(
   id BIGINT (20) UNSIGNED NOT NULL AUTO_INCREMENT,
   name VARCHAR (80) DEFAULT NULL,
-  alpha_1 CHAR (2) DEFAULT NULL,
-  alpha_2 CHAR (3) DEFAULT NULL,
   PRIMARY KEY (id)
 )
 ENGINE = INNODB
@@ -31,9 +19,6 @@ AVG_ROW_LENGTH = 5461
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
 
---
--- Описание для таблицы province
---
 CREATE TABLE province(
   id BIGINT (20) UNSIGNED NOT NULL AUTO_INCREMENT,
   country_id BIGINT (20) UNSIGNED NOT NULL,
@@ -50,19 +35,13 @@ AVG_ROW_LENGTH = 210
 CHARACTER SET utf8
 COLLATE utf8_general_ci;
 
--- 
--- Вывод данных для таблицы country
--- 
 /*!40000 ALTER TABLE country DISABLE KEYS */;
 
-  INSERT INTO country VALUES (1, 'Australia', 'AU', 'AUS'),
-  (2, 'Canada', 'CA', 'CAN'),
-  (3, 'United States of America', 'US', 'USA');
+  INSERT INTO country VALUES (1, 'Australia'),
+  (2, 'Canada'),
+  (3, 'United States of America');
 /*!40000 ALTER TABLE country ENABLE KEYS */;
 
--- 
--- Вывод данных для таблицы province
--- 
 /*!40000 ALTER TABLE province DISABLE KEYS */;
 
   INSERT INTO province VALUES (1, 1, 'Australian Capital Territory', 'ACT'),
