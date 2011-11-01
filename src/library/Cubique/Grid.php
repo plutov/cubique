@@ -291,15 +291,18 @@ class Cubique_Grid
             $search      = $post['cubique_grid_search'];
             $rowsOnPage  = intval($post['cubique_grid_rows_on_page']);
             $table       = new Zend_Db_Table($this->_table);
-            $columns     = $this->_columns;
+            if (!count($this->_columns)) {
+                throw new Cubique_Exception('`$this->_columns` can not be empty');
+            }
+            $columns = $this->_columns;
             if (count($this->_joins)) {
                 foreach ($this->_joins as $column => $join) {
                     unset($columns[$column]);
                 }
             }
-            $columns = array_keys($columns);
+            $columns     = array_keys($columns);
             $countSelect = $table->select()->from($this->_table, array($columns[0]));
-            $select = $table->select()
+            $select      = $table->select()
                     ->from($this->_table, $columns)
                     ->limitPage($table->getAdapter()->quote($currPage), $rowsOnPage);
             if (count($this->_joins)) {
