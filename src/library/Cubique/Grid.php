@@ -58,6 +58,11 @@ class Cubique_Grid
     private $_joins = array();
 
     /**
+     * @var string
+     */
+    private $_logFile;
+
+    /**
      * Sets name of the grid. Name should be a unique string with only letters and numbers.
      * @param string $name
      */
@@ -256,6 +261,23 @@ class Cubique_Grid
     }
 
     /**
+     * Logs all exceptions of getData() method to log file.
+     * @param  string $pathToLogFile
+     * @return Cubique_Grid
+     */
+    public function logErrors($pathToLogFile)
+    {
+        if (!file_exists($pathToLogFile)) {
+            throw new Cubique_Exception('Log file is not exist.');
+        }
+        if (!is_writable($pathToLogFile)) {
+            throw new Cubique_Exception('Log file is not writable');
+        }
+        $this->_logFile = $pathToLogFile;
+        return $this;
+    }
+
+    /**
      * Returns data from the table using current grid settings.
      * Result format: 'error' => bool, 'data' => array, 'count' => 0
      * @param  array $post
@@ -332,6 +354,10 @@ class Cubique_Grid
                 'error' => false
             );
         } catch (Exception $e) {
+            if ($this->_logFile) {
+                $f = fopen($this->_logFile, 'w');
+                fputs($f, Zend_Date::now()->get(Zend_Date::DATETIME_SHORT) . ': ' . $e->getMessage() . "\n");
+            }
             return array('error' => true);
         }
     }
