@@ -59,10 +59,12 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     }
     html += '</tr>';
     if (Object.size(this.columnsToSearch)) {
+        var inputValues = {};
         html += '<tr>';
         for (var j in this.columns) {
             if (typeof(this.columnsToSearch[j]) != 'undefined') {
-                column = '<input type="text" search-column="' + j + '" placeholder="search"/>';
+                column         = '<input type="text" search-column="' + j + '" placeholder="search"/>';
+                inputValues[j] = '';
             } else {
                 column = '';
             }
@@ -86,10 +88,17 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         local.showData();
         return false;
     });
+    var searchColumn = null;
+    var searchVal    = '';
     $('#cubique-' + this.name + ' input').keyup(function() {
-        local.search[$(this).attr('search-column')] = $(this).val();
-        local.currPage = 1;
-        local.showData();
+        searchColumn = $(this).attr('search-column');
+        searchVal    = $(this).val();
+        if (inputValues[searchColumn] != searchVal) {
+            local.search[searchColumn] = searchVal;
+            inputValues[searchColumn]  = searchVal;
+            local.currPage = 1;
+            local.showData();
+        }
         return false;
     });
     this.tbody = $('#cubique-' + this.name + ' tbody');
@@ -109,11 +118,13 @@ Cubique.prototype.showData = function Cubique_showData()
     $.ajax({
         type: 'post',
         data: {
-            cubique_grid_name:         local.name,
-            cubique_grid_curr_page:    local.currPage,
-            cubique_grid_sort:         local.sort,
-            cubique_grid_search:       local.search,
-            cubique_grid_rows_on_page: local.rowsOnPage
+            cubique: {
+                name:         local.name,
+                curr_page:    local.currPage,
+                sort:         local.sort,
+                search:       local.search,
+                rows_on_page: local.rowsOnPage
+            }
         },
         url: local.url ? local.url : location.href,
         dataType: 'json',
@@ -155,28 +166,25 @@ Cubique.prototype.showData = function Cubique_showData()
  */
 Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
 {
-    var pages        = '';
-    var pagesMore    = '...';
-    var currClass    = '';
-    var pagesCount   = Math.ceil(this.count/this.rowsOnPage);
-    var from         = 1;
-    var maxShown     = 10;
-    var maxShownHalf = 5;
-    var to           = pagesCount;
-    if (pagesCount > maxShown) {
-        if (this.currPage <= maxShownHalf + 1) {
+    var pages      = '';
+    var currClass  = '';
+    var pagesCount = Math.ceil(this.count/this.rowsOnPage);
+    var from       = 1;
+    var to         = pagesCount;
+    if (pagesCount > 10) {
+        if (this.currPage <= 6) {
             from = 1;
-            to   = maxShown;
-        } else if (pagesCount - this.currPage <= maxShownHalf) {
-            from = pagesCount - maxShown + 1;
+            to   = 10;
+        } else if (pagesCount - this.currPage <= 5) {
+            from = pagesCount - 11;
             to   = pagesCount;
-            pages += '<a href="#" class="go-to-page" page-number="1">1</a>' + pagesMore;
+            pages += '<a href="#" class="go-to-page" page-number="1">1</a>' + '...';
         } else {
-            from = this.currPage - maxShownHalf;
-            to   = (this.currPage + maxShownHalf <= pagesCount) ? this.currPage + maxShownHalf : pagesCount;
+            from = this.currPage - 5;
+            to   = (this.currPage + 5 <= pagesCount) ? this.currPage + 5 : pagesCount;
             pages += '<a href="#" class="go-to-page" page-number="1">1</a>';
-            if (this.currPage - maxShownHalf > 2) {
-                pages += pagesMore;
+            if (this.currPage > 7) {
+                pages += '...';
             }
         }
     }
@@ -185,8 +193,8 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         pages += '<a href="#" class="go-to-page' + currClass + '" page-number="' + i + '">' + i + '</a>';
     }
     if (pagesCount > to) {
-        if (pagesCount - this.currPage >= maxShownHalf + 2) {
-            pages += pagesMore;
+        if (pagesCount - this.currPage >= 7) {
+            pages += '...';
         }
         pages += '<a href="#" class="go-to-page" page-number="' + pagesCount + '">' + pagesCount + '</a>';
     }
@@ -195,12 +203,11 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         select += '<option value="' + this.perPageOptions[i] + '">' + this.perPageOptions[i] + '</option>';
     }
     select += '</select>';
-    var html = $('<tr class="pages"><th colspan="' + Object.size(this.columns) + '">' + pages + select + '<span class="in-total">' +
-               this.count + ' in total</span></th></tr>');
-    var thead = this.tbody.prev('thead');
-    thead.append(html);
+    var tHead = this.tbody.prev('thead');
+    tHead.append($('<tr class="pages"><th colspan="' + Object.size(this.columns) + '">' + pages + select + '<span class="in-total">' +
+               this.count + ' in total</span></th></tr>'));
     var local = this;
-    thead.find('.go-to-page').click(function() {
+    tHead.find('.go-to-page').click(function() {
         local.currPage = parseInt($(this).attr('page-number'));
         if (isLocalStorageAvailable()) {
             localStorage.setItem(local.name + '_currPage', local.currPage);
@@ -208,7 +215,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         local.showData();
         return false;
     });
-    thead.find('.per-page').change(function() {
+    tHead.find('.per-page').change(function() {
         local.rowsOnPage = $(this).val();
         if (isLocalStorageAvailable()) {
             localStorage.setItem(local.name + '_rowsOnPage', local.rowsOnPage);

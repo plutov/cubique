@@ -286,10 +286,14 @@ class Cubique_Grid
     public function getData($post)
     {
         try {
-            $currPage    = intval($post['cubique_grid_curr_page']);
-            $sort        = $post['cubique_grid_sort'];
-            $search      = $post['cubique_grid_search'];
-            $rowsOnPage  = intval($post['cubique_grid_rows_on_page']);
+            if (!isset($post['cubique'])) {
+                throw new Exception('Invalid post data');
+            }
+            $cubique     = $post['cubique'];
+            $currPage    = intval($cubique['curr_page']);
+            $sort        = $cubique['sort'];
+            $search      = $cubique['search'];
+            $rowsOnPage  = intval($cubique['rows_on_page']);
             $table       = new Zend_Db_Table($this->_table);
             if (!count($this->_columns)) {
                 throw new Cubique_Exception('`$this->_columns` can not be empty');
