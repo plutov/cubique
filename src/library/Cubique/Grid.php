@@ -387,7 +387,7 @@ class Cubique_Grid
     }
 
     /**
-     * Throw type exception
+     * Throw type exception.
      * @param  string $type
      * @param  string $variable
      * @return void
