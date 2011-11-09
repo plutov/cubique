@@ -69,14 +69,14 @@ class Cubique_Grid
     public function __construct($name)
     {
         if (!is_string($name)) {
-            throw new Cubique_Exception('String expected for `$name`');
+            $this->_typeException('string', '$name');
         }
         if (!$name) {
-            throw new Cubique_Exception('`$name` can not be empty');
+            throw new Cubique_Exception('"$name" can not be empty.');
         }
         $alnum = new Zend_Validate_Alnum();
         if (!$alnum->isValid($name)) {
-            throw new Cubique_Exception('`$name` can contains only letters and numbers');
+            throw new Cubique_Exception('"$name" can contains only letters and numbers.');
         }
         $this->_name = $name;
     }
@@ -89,7 +89,7 @@ class Cubique_Grid
     public function setTable($table)
     {
         if (!is_string($table)) {
-            throw new Cubique_Exception('String expected for `$table`');
+            $this->_typeException('string', '$table');
         }
         $this->_table   = $table;
         return $this;
@@ -103,15 +103,15 @@ class Cubique_Grid
     public function setColumns($columns)
     {
         if (!is_array($columns)) {
-            throw new Cubique_Exception('Array expected for `$columns`');
+            $this->_typeException('array', '$columns');
         }
         if (count($columns)) {
             foreach ($columns as $columnName => $columnLabel) {
                 if (!is_string($columnName)) {
-                    throw new Cubique_Exception('String expected for `$columnName`');
+                    $this->_typeException('string', '$columnName');
                 }
                 if (!is_string($columnLabel)) {
-                    throw new Cubique_Exception('String expected for `$columnLabel`');
+                    $this->_typeException('string', '$columnLabel');
                 }
             }
             $this->_columns = $columns;
@@ -127,7 +127,7 @@ class Cubique_Grid
     public function setDefaultOrder($order)
     {
         if (!is_string($order)) {
-            throw new Cubique_Exception('String expected for `$order`');
+            $this->_typeException('string', '$order');
         }
         $this->_defaultOrder = $order;
         return $this;
@@ -141,10 +141,10 @@ class Cubique_Grid
     public function setRowsOnPage($rowsOnPage)
     {
         if (!is_int($rowsOnPage)) {
-            throw new Cubique_Exception('Int expected for `$rowsOnPage`');
+            $this->_typeException('int', '$rowsOnPage');
         }
         if ($rowsOnPage <= 0) {
-            throw new Cubique_Exception('Invalid value for `$rowsOnPage`');
+            throw new Cubique_Exception('Invalid value for "$rowsOnPage".');
         }
         $this->_rowsOnPage = $rowsOnPage;
         return $this;
@@ -200,14 +200,14 @@ class Cubique_Grid
     private function _checkColumnsExistAndStrings($columns)
     {
         if (!is_array($columns)) {
-            throw new Cubique_Exception('Array expected for `$columns`');
+            $this->_typeException('array', '$columns');
         }
         foreach ($columns as $column) {
             if (!is_string($column)) {
-                throw new Cubique_Exception('String expected for `$column`');
+                $this->_typeException('string', '$column');
             }
             if (!array_key_exists($column, $this->_columns)) {
-                throw new Cubique_Exception('Column not found');
+                throw new Cubique_Exception('Column "' . $column . '" not found.');
             }
         }
     }
@@ -220,7 +220,7 @@ class Cubique_Grid
     public function setUrl($url)
     {
         if (!is_string($url)) {
-            throw new Cubique_Exception('String expected for `$url`');
+            $this->_typeException('string', '$url');
         }
         $this->_url = $url;
         return $this;
@@ -240,16 +240,16 @@ class Cubique_Grid
         $columns = array($column);
         $this->_checkColumnsExistAndStrings($columns);
         if (!is_string($joinTable)) {
-            throw new Cubique_Exception('String expected for `$joinTable`');
+            $this->_typeException('string', '$joinTable');
         }
         if (!is_string($conditionColumn)) {
-            throw new Cubique_Exception('String expected for `$conditionColumn`');
+            $this->_typeException('string', '$conditionColumn');
         }
         if (!is_string($conditionJoinColumn)) {
-            throw new Cubique_Exception('String expected for `$conditionJoinColumn`');
+            $this->_typeException('string', '$conditionJoinColumn');
         }
         if (!is_string($selectColumn)) {
-            throw new Cubique_Exception('String expected for `$selectColumn`');
+            $this->_typeException('string', '$selectColumn');
         }
         $this->_joins[$column] = array(
             'join_table'            => $joinTable,
@@ -296,7 +296,7 @@ class Cubique_Grid
             $rowsOnPage  = intval($cubique['rows_on_page']);
             $table       = new Zend_Db_Table($this->_table);
             if (!count($this->_columns)) {
-                throw new Cubique_Exception('`$this->_columns` can not be empty');
+                throw new Cubique_Exception('"$this->_columns" can not be empty.');
             }
             $columns = $this->_columns;
             if (count($this->_joins)) {
@@ -384,5 +384,16 @@ class Cubique_Grid
         ));
         return '<div id="cubique-' . $this->_name . '"></div><script type="text/javascript">$(document).ready(
                function(){cubique_' . $this->_name . '=new Cubique(' . $options . ');});</script>';
+    }
+
+    /**
+     * Throw type exception
+     * @param  string $type
+     * @param  string $variable
+     * @return void
+     */
+    private function _typeException($type, $variable)
+    {
+        throw new Exception(ucfirst($type) . ' expected for "' . $variable . '".');
     }
 }
