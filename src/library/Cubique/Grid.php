@@ -308,12 +308,12 @@ class Cubique_Grid
             if (!isset($post['cubique'])) {
                 throw new Exception('Invalid post data');
             }
-            $cubique     = $post['cubique'];
-            $currPage    = intval($cubique['curr_page']);
-            $sort        = $cubique['sort'];
-            $search      = $cubique['search'];
-            $rowsOnPage  = intval($cubique['rows_on_page']);
-            $table       = new Zend_Db_Table($this->_table);
+            $cubique    = $post['cubique'];
+            $currPage   = intval($cubique['curr_page']);
+            $sort       = $cubique['sort'];
+            $search     = $cubique['search'];
+            $rowsOnPage = intval($cubique['rows_on_page']);
+            $table      = new Zend_Db_Table($this->_table);
             if (!count($this->_columns)) {
                 throw new Cubique_Exception('"$this->_columns" can not be empty.');
             }
@@ -381,7 +381,8 @@ class Cubique_Grid
             );
         } catch (Exception $e) {
             if ($this->_logFile) {
-                file_put_contents($this->_logFile, Zend_Date::now()->get(Zend_Date::DATETIME_MEDIUM) . ': ' . $e->getMessage() . "\n", FILE_APPEND);
+                file_put_contents($this->_logFile, str_pad(Zend_Date::now()->get(Zend_Date::DATETIME_MEDIUM) . ':', 20) .
+                    ' ' . $e->getMessage() . "\n", FILE_APPEND);
             }
             return array('error' => true);
         }
