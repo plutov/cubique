@@ -26,11 +26,11 @@ Cubique = function(options)
     if (isLocalStorageAvailable()) {
         var rowsOnPageLS = localStorage.getItem(this.name + '_rowsOnPage');
         var currPageLS   = localStorage.getItem(this.name + '_currPage');
-        if (rowsOnPageLS) {
+        if (rowsOnPageLS && $.inArray(rowsOnPageLS, perPagesOptions) != -1) {
             this.rowsOnPage = rowsOnPageLS;
-        }
-        if (currPageLS) {
-            this.currPage = currPageLS;
+            if (currPageLS) {
+                this.currPage = currPageLS;
+            }
         }
     }
     this.perPageOptions  = {};
