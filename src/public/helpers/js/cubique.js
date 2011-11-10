@@ -20,6 +20,9 @@ Cubique = function(options)
     this.sort           = '';
     this.search         = {};
     var perPagesOptions = [10, 25, 50, 100];
+    perPagesOptions.push(this.rowsOnPage);
+    perPagesOptions.sort(function(a,b){return a-b;});
+    perPagesOptions.join();
     if (isLocalStorageAvailable()) {
         var rowsOnPageLS = localStorage.getItem(this.name + '_rowsOnPage');
         var currPageLS   = localStorage.getItem(this.name + '_currPage');
@@ -30,9 +33,6 @@ Cubique = function(options)
             this.currPage = currPageLS;
         }
     }
-    perPagesOptions.push(this.rowsOnPage);
-    perPagesOptions.sort(function(a,b){return a-b;});
-    perPagesOptions.join();
     this.perPageOptions  = {};
     for (var j in perPagesOptions) {
         this.perPageOptions[perPagesOptions[j]] = perPagesOptions[j];
@@ -177,25 +177,24 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         } else if (pagesCount - this.currPage <= 5) {
             from = pagesCount - 11;
             to   = pagesCount;
-            pages += '<a href="#" class="go-to-page" page-number="1">1</a>' + '...';
+            pages += this.getGoToPageLink(1, false) + '...';
         } else {
             from = this.currPage - 5;
             to   = (this.currPage + 5 <= pagesCount) ? this.currPage + 5 : pagesCount;
-            pages += '<a href="#" class="go-to-page" page-number="1">1</a>';
+            pages += this.getGoToPageLink(1, false);
             if (this.currPage > 7) {
                 pages += '...';
             }
         }
     }
     for (var i = from; i <= to; i++) {
-        currClass = i == this.currPage ? ' curr' : ''
-        pages += '<a href="#" class="go-to-page' + currClass + '" page-number="' + i + '">' + i + '</a>';
+        pages += this.getGoToPageLink(i, i == this.currPage);
     }
     if (pagesCount > to) {
         if (pagesCount - this.currPage >= 7) {
             pages += '...';
         }
-        pages += '<a href="#" class="go-to-page" page-number="' + pagesCount + '">' + pagesCount + '</a>';
+        pages += this.getGoToPageLink(pagesCount, false);
     }
     var select = '<select class="per-page">';
     for (var i in this.perPageOptions) {
@@ -224,6 +223,11 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         local.showData();
         return false;
     }).val(this.rowsOnPage);
+}
+
+Cubique.prototype.getGoToPageLink = function Cubique_getGoToPageLink(pageNumber, isCurrent)
+{
+    return '<a href="#" class="go-to-page' + (isCurrent ? ' curr' : '') + '" page-number="' + pageNumber + '">' + pageNumber + '</a>'
 }
 
 /**
