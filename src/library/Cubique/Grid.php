@@ -283,6 +283,7 @@ class Cubique_Grid
     }
 
     /**
+     * Sets message for displaying error.
      * @param  string $message
      * @return Cubique_Grid
      */
