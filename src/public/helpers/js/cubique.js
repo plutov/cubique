@@ -130,8 +130,7 @@ Cubique.prototype.showData = function Cubique_showData()
         dataType: 'json',
         success:  function(response) {
             if (response.error) {
-                local.tbody.html('<tr><td colspan="' + columnsCount + '" class="error">' +
-                                 'Error has been occurred. Try to refresh the page.</td></tr>');
+                local.tbody.html('<tr><td colspan="' + columnsCount + '" class="error">' + local.error_message + '</td></tr>');
             } else {
                 local.count = response.count;
                 var html = '';

@@ -63,6 +63,11 @@ class Cubique_Grid
     private $_logFile;
 
     /**
+     * @var string
+     */
+    private $_errorMessage = 'Error has been occurred. Try to refresh the page.';
+
+    /**
      * Sets name of the grid. Name should be a unique string with only letters and numbers.
      * @param string $name
      */
@@ -278,6 +283,19 @@ class Cubique_Grid
     }
 
     /**
+     * @param  string $message
+     * @return Cubique_Grid
+     */
+    public function setErrorMessage($message)
+    {
+        if (!is_string($message)) {
+            $this->_typeException('string', '$message');
+        }
+        $this->_errorMessage = $message;
+        return $this;
+    }
+
+    /**
      * Returns data from the table using current grid settings.
      * Result format: 'error' => bool, 'data' => array, 'count' => 0
      * @param  array $post
@@ -380,7 +398,8 @@ class Cubique_Grid
             'rowsOnPage'      => $this->_rowsOnPage,
             'columnsToSort'   => $this->_columnsToSort,
             'columnsToSearch' => $this->_columnsToSearch,
-            'url'             => $this->_url
+            'url'             => $this->_url,
+            'error_message'   => $this->_errorMessage
         ));
         return '<div id="cubique-' . $this->_name . '"></div><script type="text/javascript">$(document).ready(
                function(){cubique_' . $this->_name . '=new Cubique(' . $options . ');});</script>';
