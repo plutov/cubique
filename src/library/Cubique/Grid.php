@@ -318,10 +318,8 @@ class Cubique_Grid
                 throw new Cubique_Exception('"$this->_columns" can not be empty.');
             }
             $columns = $this->_columns;
-            if (count($this->_joins)) {
-                foreach ($this->_joins as $column => $join) {
-                    unset($columns[$column]);
-                }
+            foreach ($this->_joins as $column => $join) {
+                unset($columns[$column]);
             }
             $columns     = array_keys($columns);
             $countSelect = $table->select()
@@ -331,15 +329,13 @@ class Cubique_Grid
                     ->from($this->_table, $columns)
                     ->setIntegrityCheck(false)
                     ->limitPage($table->getAdapter()->quote($currPage), $rowsOnPage);
-            if (count($this->_joins)) {
-                foreach ($this->_joins as $column => $join) {
-                    $joinTable     = $join['join_table'];
-                    $joinSelect    = array($column => $join['select_column']);
-                    $joinCondition = $join['join_table'] . '.' . $join['condition_join_column'] . '=' .
-                        $this->_table . '.' . $join['condition_column'];
-                    $select->joinLeft($joinTable, $joinCondition, $joinSelect);
-                    $countSelect->joinLeft($joinTable, $joinCondition, $joinSelect);
-                }
+            foreach ($this->_joins as $column => $join) {
+                $joinTable     = $join['join_table'];
+                $joinSelect    = array($column => $join['select_column']);
+                $joinCondition = $join['join_table'] . '.' . $join['condition_join_column'] . '=' .
+                    $this->_table . '.' . $join['condition_column'];
+                $select->joinLeft($joinTable, $joinCondition, $joinSelect);
+                $countSelect->joinLeft($joinTable, $joinCondition, $joinSelect);
             }
             if ($sort) {
                 $select->order($sort);
