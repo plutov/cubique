@@ -141,7 +141,7 @@ class Cubique_Grid
     /**
      * Sets default number of items per page.
      * @param  int $rowsOnPage
-     * @return void
+     * @return Cubique_Grid
      */
     public function setRowsOnPage($rowsOnPage)
     {
@@ -324,13 +324,14 @@ class Cubique_Grid
                 }
             }
             $columns     = array_keys($columns);
-            $countSelect = $table->select()->from($this->_table, array($columns[0]));
+            $countSelect = $table->select()
+                    ->from($this->_table, array($columns[0]))
+                    ->setIntegrityCheck(false);
             $select      = $table->select()
                     ->from($this->_table, $columns)
+                    ->setIntegrityCheck(false)
                     ->limitPage($table->getAdapter()->quote($currPage), $rowsOnPage);
             if (count($this->_joins)) {
-                $countSelect->setIntegrityCheck(false);
-                $select->setIntegrityCheck(false);
                 foreach ($this->_joins as $column => $join) {
                     $joinTable     = $join['join_table'];
                     $joinSelect    = array($column => $join['select_column']);
