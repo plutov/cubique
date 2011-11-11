@@ -24,13 +24,15 @@ Cubique = function(options)
     perPagesOptions.sort(function(a,b){return a-b;});
     perPagesOptions.join();
     if (isLocalStorageAvailable()) {
-        var rowsOnPageLS = localStorage.getItem(this.name + '_rowsOnPage');
-        var currPageLS   = localStorage.getItem(this.name + '_currPage');
+        var rowsOnPageLS = parseInt(localStorage.getItem(this.name + '_rowsOnPage'));
+        var currPageLS   = parseInt(localStorage.getItem(this.name + '_currPage'));
         if (rowsOnPageLS && $.inArray(rowsOnPageLS, perPagesOptions) != -1) {
             this.rowsOnPage = rowsOnPageLS;
             if (currPageLS) {
                 this.currPage = currPageLS;
             }
+        } else {
+            localStorage.setItem(this.name + '_rowsOnPage', 10);
         }
     }
     this.perPageOptions  = {};
