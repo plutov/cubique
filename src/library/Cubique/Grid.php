@@ -406,8 +406,12 @@ class Cubique_Grid
             'url'             => $this->_url,
             'error_message'   => $this->_errorMessage
         ));
-        return '<div id="cubique-' . $this->_name . '"></div><script type="text/javascript">$(document).ready(
-               function(){cubique_' . $this->_name . '=new Cubique(' . $options . ');});</script>';
+        return '<div id="cubique-' . $this->_name . '"></div>' . PHP_EOL .
+               '<script type="text/javascript">' . PHP_EOL .
+               '$(document).ready(function(){' . PHP_EOL .
+               'cubique_' . $this->_name . '=new Cubique(' . $options . ');' . PHP_EOL .
+               '});' . PHP_EOL .
+               '</script>' . PHP_EOL;
     }
 
     /**
