@@ -272,6 +272,9 @@ class Cubique_Grid
      */
     public function logErrors($pathToLogFile)
     {
+        if (!is_string($pathToLogFile)) {
+            $this->_typeException('string', '$pathToLogFile');
+        }
         if (!file_exists($pathToLogFile)) {
             throw new Cubique_Exception('Log file is not exist.');
         }
