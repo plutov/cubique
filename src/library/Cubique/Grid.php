@@ -309,7 +309,7 @@ class Cubique_Grid
     {
         try {
             if (!isset($post['cubique'])) {
-                throw new Exception('Invalid post data');
+                throw new Cubique_Exception('Invalid post data');
             }
             $cubique    = $post['cubique'];
             $currPage   = intval($cubique['curr_page']);
@@ -422,6 +422,6 @@ class Cubique_Grid
      */
     private function _typeException($type, $variable)
     {
-        throw new Exception(ucfirst($type) . ' expected for "' . $variable . '".');
+        throw new Cubique_Exception(ucfirst($type) . ' expected for "' . $variable . '".');
     }
 }
