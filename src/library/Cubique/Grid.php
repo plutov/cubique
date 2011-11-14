@@ -313,6 +313,9 @@ class Cubique_Grid
             $sort       = $cubique['sort'];
             $search     = $cubique['search'];
             $rowsOnPage = intval($cubique['rows_on_page']);
+            if (!$this->_table) {
+                throw new Cubique_Exception('"$this->_table" can not be empty.');
+            }
             $table      = new Zend_Db_Table($this->_table);
             if (!count($this->_columns)) {
                 throw new Cubique_Exception('"$this->_columns" can not be empty.');
