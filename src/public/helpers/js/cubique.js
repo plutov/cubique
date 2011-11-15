@@ -6,8 +6,8 @@
  */
 
 /**
- * Constructor
- * @param  object options
+ * Set common variables, render grid, get data.
+ * @param  options object
  * @return void
  */
 Cubique = function(options)
@@ -44,7 +44,7 @@ Cubique = function(options)
 }
 
 /**
- * Render main grid HTML
+ * Render main grid HTML.
  * @return void
  */
 Cubique.prototype.renderGrid = function Cubique_renderGrid()
@@ -60,8 +60,8 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         html += '<th>' + column + '</th>';
     }
     html += '</tr>';
+    var inputValues = {};
     if (Object.size(this.columnsToSearch)) {
-        var inputValues = {};
         html += '<tr>';
         for (var j in this.columns) {
             if (typeof(this.columnsToSearch[j]) != 'undefined') {
@@ -79,9 +79,10 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     var sortOrder  = 'ASC';
     var sortColumn = '';
     var local      = this;
-    $('#cubique-' + this.name + ' a.sort-by').click(function() {
-        $('#cubique-' + local.name + ' a.sort-by').prev('span').html('');
-        sortOrder   = $(this).attr('sort-rotation');
+    var sortLinks  = $('#cubique-' + this.name + ' a.sort-by');
+    sortLinks.click(function() {
+        sortLinks.prev('span').html('');
+        sortOrder      = $(this).attr('sort-rotation');
         sortColumn     = $(this).attr('sort-column');
         local.currPage = 1;
         local.sort     = sortColumn + ' ' + sortOrder;
@@ -107,7 +108,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
 }
 
 /**
- * Make AJAX request to the server and display data
+ * Make AJAX request to the server and display data.
  * @return void
  */
 Cubique.prototype.showData = function Cubique_showData()
@@ -162,7 +163,7 @@ Cubique.prototype.showData = function Cubique_showData()
 }
 
 /**
- * Render pages section
+ * Render pages section.
  * @return void
  */
 Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
@@ -233,8 +234,8 @@ Cubique.prototype.getGoToPageLink = function Cubique_getGoToPageLink(pageNumber,
 }
 
 /**
- * Get object size (count of elements)
- * @param  object obj
+ * Get object size.
+ * @param  obj object
  * @return int
  */
 Object.size = function(obj)
@@ -247,7 +248,7 @@ Object.size = function(obj)
 }
 
 /**
- * Checks if client's browser supports Local Storage
+ * Checks if client's browser supports Local Storage.
  * @return bool
  */
 function isLocalStorageAvailable() {
