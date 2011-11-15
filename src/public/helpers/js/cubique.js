@@ -103,6 +103,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         return false;
     });
     this.tbody = $('#cubique-' + this.name + ' tbody');
+    this.thead = $('#cubique-' + this.name + ' thead');
 }
 
 /**
@@ -152,7 +153,7 @@ Cubique.prototype.showData = function Cubique_showData()
                 .mouseleave(function() {
                     $(this).parent().removeClass('hovered');
                 });
-                local.tbody.prev('thead').find('.pages').remove();
+                local.thead.find('.pages').remove();
                 local.renderPagesSection();
             }
             loading.remove();
@@ -202,11 +203,10 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         select += '<option value="' + this.perPageOptions[i] + '">' + this.perPageOptions[i] + '</option>';
     }
     select += '</select>';
-    var tHead = this.tbody.prev('thead');
-    tHead.append($('<tr class="pages"><th colspan="' + this.getObjectSize(this.columns) + '">' + pages + select + '<span class="in-total">' +
+    this.thead.append($('<tr class="pages"><th colspan="' + this.getObjectSize(this.columns) + '">' + pages + select + '<span class="in-total">' +
                this.count + ' in total</span></th></tr>'));
     var local = this;
-    tHead.find('.go-to-page').click(function() {
+    this.thead.find('.go-to-page').click(function() {
         local.currPage = parseInt($(this).attr('data-number'));
         if (local.isLocalStorageAvailable()) {
             localStorage.setItem(local.name + '_currPage', local.currPage);
@@ -214,7 +214,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         local.showData();
         return false;
     });
-    tHead.find('.per-page').change(function() {
+    this.thead.find('.per-page').change(function() {
         local.rowsOnPage = $(this).val();
         if (local.isLocalStorageAvailable()) {
             localStorage.setItem(local.name + '_rowsOnPage', local.rowsOnPage);
@@ -240,7 +240,9 @@ Cubique.prototype.getObjectSize = function Cubique_getObjectSize(obj)
 {
     var size = 0;
     for (var key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
+        if (obj.hasOwnProperty(key)) {
+            size++;
+        }
     }
     return size;
 }
