@@ -51,7 +51,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     var column = '';
     for (var i in this.columns) {
         if (typeof(this.columnsToSort[i]) != 'undefined') {
-            column = '<span></span> <a href="#" class="sort-by" sort-column="' + i + '" sort-rotation="ASC">' + this.columns[i] + '</a>';
+            column = '<span></span> <a href="#" class="sort-by" data-column="' + i + '" data-order="ASC">' + this.columns[i] + '</a>';
         } else {
             column = this.columns[i];
         }
@@ -63,7 +63,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         html += '<tr>';
         for (var j in this.columns) {
             if (typeof(this.columnsToSearch[j]) != 'undefined') {
-                column         = '<input type="text" search-column="' + j + '" placeholder="search"/>';
+                column         = '<input type="text" data-column="' + j + '" placeholder="search"/>';
                 inputValues[j] = '';
             } else {
                 column = '';
@@ -80,11 +80,11 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     var sortLinks  = $('#cubique-' + this.name + ' a.sort-by');
     sortLinks.click(function() {
         sortLinks.prev('span').html('');
-        sortOrder      = $(this).attr('sort-rotation');
-        sortColumn     = $(this).attr('sort-column');
+        sortOrder      = $(this).attr('data-order');
+        sortColumn     = $(this).attr('data-column');
         local.currPage = 1;
         local.sort     = sortColumn + ' ' + sortOrder;
-        $(this).attr('sort-rotation', sortOrder == 'ASC' ? 'DESC' : 'ASC');
+        $(this).attr('data-order', sortOrder == 'ASC' ? 'DESC' : 'ASC');
         $(this).prev('span').html(sortOrder == 'ASC' ? '&darr;' : '&uarr;');
         local.showData();
         return false;
@@ -92,7 +92,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     var searchColumn = null;
     var searchVal    = '';
     $('#cubique-' + this.name + ' input').keyup(function() {
-        searchColumn = $(this).attr('search-column');
+        searchColumn = $(this).attr('data-column');
         searchVal    = $(this).val();
         if (inputValues[searchColumn] != searchVal) {
             local.search[searchColumn] = searchVal;
@@ -207,7 +207,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
                this.count + ' in total</span></th></tr>'));
     var local = this;
     tHead.find('.go-to-page').click(function() {
-        local.currPage = parseInt($(this).attr('page-number'));
+        local.currPage = parseInt($(this).attr('data-number'));
         if (local.isLocalStorageAvailable()) {
             localStorage.setItem(local.name + '_currPage', local.currPage);
         }
@@ -228,7 +228,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
 
 Cubique.prototype.getGoToPageLink = function Cubique_getGoToPageLink(pageNumber, isCurrent)
 {
-    return '<a href="#" class="go-to-page' + (isCurrent ? ' curr' : '') + '" page-number="' + pageNumber + '">' + pageNumber + '</a>'
+    return '<a href="#" class="go-to-page' + (isCurrent ? ' curr' : '') + '" data-number="' + pageNumber + '">' + pageNumber + '</a>'
 }
 
 /**
