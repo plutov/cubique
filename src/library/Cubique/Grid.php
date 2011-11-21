@@ -415,6 +415,19 @@ class Cubique_Grid
     }
 
     /**
+     * Call getData with POST data.
+     * @param  Zend_Controller_Request_Http $request
+     * @return void
+     */
+    public function dispatch($request)
+    {
+        if ($request->isXmlHttpRequest()) {
+            $json = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
+            $json->sendJson($this->getData($request->getPost()));
+        }
+    }
+
+    /**
      * Throw type exception.
      * @param  string $type
      * @param  string $variable
