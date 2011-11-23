@@ -45,6 +45,8 @@
 }
 .cubique a.go-to-page {
     float: left;
+    height: 16px;
+    line-height: 16px;
     background: #fff;
     font-weight: normal;
     margin: 0px 3px;
