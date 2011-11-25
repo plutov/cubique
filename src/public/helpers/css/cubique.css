@@ -6,7 +6,8 @@
  */
 
 .cubique, .cubique tbody, .cubique thead, .cubique tr, .cubique th, .cubique td {
-    font-size: 14px;
+    font-family: Arial;
+    font-size: 12px;
     color: #333;
 }
 .cubique {
