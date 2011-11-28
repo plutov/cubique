@@ -384,8 +384,8 @@ class Cubique_Grid
             );
         } catch (Exception $e) {
             if ($this->_logFile) {
-                file_put_contents($this->_logFile, str_pad(Zend_Date::now()->get(Zend_Date::DATETIME_MEDIUM) . ':', 20) .
-                    ' ' . $e->getMessage() . "\n", FILE_APPEND);
+                file_put_contents($this->_logFile, str_pad(Zend_Date::now()->get(Zend_Date::DATETIME_MEDIUM) . ':', 20)
+                    . ' ' . $e->getMessage() . "\n", FILE_APPEND);
             }
             return array('error' => true);
         }
@@ -397,7 +397,7 @@ class Cubique_Grid
      */
     public function __toString()
     {
-        $options = Zend_Json_Encoder::encode(array(
+        $optionsJson = Zend_Json_Encoder::encode(array(
             'name'            => $this->_name,
             'columns'         => $this->_columns,
             'rowsOnPage'      => $this->_rowsOnPage,
@@ -408,9 +408,9 @@ class Cubique_Grid
         ));
         return '<div id="cubique-' . $this->_name . '"></div>' . PHP_EOL .
                '<script type="text/javascript">' . PHP_EOL .
-               '$(document).ready(function(){' . PHP_EOL .
-               'cubique_' . $this->_name . '=new Cubique(' . $options . ');' . PHP_EOL .
-               '});' . PHP_EOL .
+                   '$(document).ready(function() {' . PHP_EOL .
+                       'cubique_' . $this->_name . ' = new Cubique(' . $optionsJson . ');' . PHP_EOL .
+                   '});' . PHP_EOL .
                '</script>' . PHP_EOL;
     }
 
@@ -422,8 +422,8 @@ class Cubique_Grid
     {
         $request = Zend_Controller_Front::getInstance()->getRequest();
         if ($request->isXmlHttpRequest()) {
-            $json = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
-            $json->sendJson($this->getData($request->getPost()));
+            $jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
+            $jsonHelper->sendJson($this->getData($request->getPost()));
         }
     }
 
