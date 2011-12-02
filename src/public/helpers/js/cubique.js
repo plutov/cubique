@@ -172,6 +172,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
     var pagesCount = Math.ceil(this.count/this.rowsOnPage);
     var from       = 1;
     var to         = pagesCount;
+    var moreSpan   = '<span class="more">...</span>';
     if (pagesCount > 10) {
         if (this.currPage <= 6) {
             from = 1;
@@ -179,13 +180,13 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         } else if (pagesCount - this.currPage <= 5) {
             from = pagesCount - 11;
             to   = pagesCount;
-            pages += this.getGoToPageLink(1, false) + '...';
+            pages += this.getGoToPageLink(1, false) + moreSpan;
         } else {
             from = this.currPage - 5;
             to   = (this.currPage + 5 <= pagesCount) ? this.currPage + 5 : pagesCount;
             pages += this.getGoToPageLink(1, false);
             if (this.currPage > 7) {
-                pages += '...';
+                pages += moreSpan;
             }
         }
     }
@@ -194,7 +195,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
     }
     if (pagesCount > to) {
         if (pagesCount - this.currPage >= 7) {
-            pages += '...';
+            pages += moreSpan;
         }
         pages += this.getGoToPageLink(pagesCount, false);
     }

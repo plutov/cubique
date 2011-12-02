@@ -80,3 +80,9 @@
     border: 1px solid #ccc;
     border-radius: 3px;
 }
+.cubique span.more {
+    height: 12px;
+    line-height: 12px;
+    float: left;
+    margin: 0px 3px;
+}
