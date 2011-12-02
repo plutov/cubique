@@ -96,7 +96,7 @@ class Cubique_Grid
         if (!is_string($table)) {
             $this->_typeException('string', '$table');
         }
-        $this->_table   = $table;
+        $this->_table = $table;
         return $this;
     }
 
@@ -110,17 +110,15 @@ class Cubique_Grid
         if (!is_array($columns)) {
             $this->_typeException('array', '$columns');
         }
-        if (count($columns)) {
-            foreach ($columns as $columnName => $columnLabel) {
-                if (!is_string($columnName)) {
-                    $this->_typeException('string', '$columnName');
-                }
-                if (!is_string($columnLabel)) {
-                    $this->_typeException('string', '$columnLabel');
-                }
+        foreach ($columns as $columnName => $columnLabel) {
+            if (!is_string($columnName)) {
+                $this->_typeException('string', '$columnName');
             }
-            $this->_columns = $columns;
+            if (!is_string($columnLabel)) {
+                $this->_typeException('string', '$columnLabel');
+            }
         }
+        $this->_columns = $columns;
         return $this;
     }
 
