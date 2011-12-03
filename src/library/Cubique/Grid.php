@@ -96,7 +96,7 @@ class Cubique_Grid
         if (!is_string($table)) {
             $this->_typeException('string', '$table');
         }
-        $this->_table = $table;
+        $this->_table   = $table;
         return $this;
     }
 
@@ -110,15 +110,17 @@ class Cubique_Grid
         if (!is_array($columns)) {
             $this->_typeException('array', '$columns');
         }
-        foreach ($columns as $columnName => $columnLabel) {
-            if (!is_string($columnName)) {
-                $this->_typeException('string', '$columnName');
+        if (count($columns)) {
+            foreach ($columns as $columnName => $columnLabel) {
+                if (!is_string($columnName)) {
+                    $this->_typeException('string', '$columnName');
+                }
+                if (!is_string($columnLabel)) {
+                    $this->_typeException('string', '$columnLabel');
+                }
             }
-            if (!is_string($columnLabel)) {
-                $this->_typeException('string', '$columnLabel');
-            }
+            $this->_columns = $columns;
         }
-        $this->_columns = $columns;
         return $this;
     }
 
@@ -264,7 +266,7 @@ class Cubique_Grid
     }
 
     /**
-     * Logs all exceptions of getData() method to log file.
+     * Logs all exceptions of _getData() method to log file.
      * @param  string $pathToLogFile
      * @return Cubique_Grid
      */
@@ -303,7 +305,7 @@ class Cubique_Grid
      * @param  array $post
      * @return array
      */
-    public function getData($post)
+    private function _getData($post)
     {
         try {
             if (!isset($post['cubique'])) {
@@ -413,7 +415,7 @@ class Cubique_Grid
     }
 
     /**
-     * Call getData with POST data.
+     * Call _getData with POST data.
      * @return void
      */
     public function dispatch()
@@ -421,7 +423,7 @@ class Cubique_Grid
         $request = Zend_Controller_Front::getInstance()->getRequest();
         if ($request->isXmlHttpRequest()) {
             $jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
-            $jsonHelper->sendJson($this->getData($request->getPost()));
+            $jsonHelper->sendJson($this->_getData($request->getPost()));
         }
     }
 
