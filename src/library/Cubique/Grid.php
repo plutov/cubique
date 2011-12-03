@@ -415,7 +415,7 @@ class Cubique_Grid
     }
 
     /**
-     * Call _getData with POST data.
+     * Call _getData() method with POST data.
      * @return void
      */
     public function dispatch()
