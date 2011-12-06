@@ -71,6 +71,7 @@
 }
 .cubique input {
     border: 1px solid #ccc;
+    padding-left: 3px;
     border-radius: 3px;
 }
 .cubique select.per-page {
