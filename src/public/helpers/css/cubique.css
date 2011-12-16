@@ -2,12 +2,16 @@
  * Cubique
  * @author    Alexander Plutov
  * @copyright (c) 2011 Alexander Plutov
+ * @link      https://github.com/plutov/cubique
  * @license   https://github.com/plutov/cubique/wiki/License
  */
 
 .cubique, .cubique tbody, .cubique thead, .cubique tr, .cubique th, .cubique td {
     font-family: Arial;
     font-size: 12px;
+    color: #333;
+}
+.cubique span.order {
     color: #333;
 }
 .cubique {
