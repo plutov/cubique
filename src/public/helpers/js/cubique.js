@@ -51,7 +51,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     var column = '';
     for (var i in this.columns) {
         if (typeof(this.columnsToSort[i]) != 'undefined') {
-            column = '<span></span> <a href="#" class="sort-by" data-column="' + i + '" data-order="ASC">' + this.columns[i] + '</a>';
+            column = '<span class="order"></span> <a href="#" class="sort-by" data-column="' + i + '" data-order="ASC">' + this.columns[i] + '</a>';
         } else {
             column = this.columns[i];
         }
