@@ -10,9 +10,10 @@ class IndexController extends Zend_Controller_Action
                     'code'        => 'Code',
                     'country'     => 'Country'
                 ))
+                ->setSpecialData('name', '<a href="/?country=<!name!>"><!name!></a>')
                 ->setDefaultOrder('name')
                 ->setColumnsToSort(array('name', 'code', 'country'))
-                ->setColumnsToEscape(array('name', 'code'))
+                ->setColumnsToEscape(array('code'))
                 ->setColumnsToSearch(array('name', 'code', 'country'))
                 ->setJoin('country', 'country', 'country_id', 'id', 'name');
         $grid->dispatch();

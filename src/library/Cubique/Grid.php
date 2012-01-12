@@ -69,6 +69,16 @@ class Cubique_Grid
     private $_errorMessage = 'Error has been occurred. Try to refresh the page.';
 
     /**
+     * @var array
+     */
+    private $_specialDataSeparators = array('<!', '!>');
+
+    /**
+     * @var array
+     */
+    private $_specialData = array();
+
+    /**
      * Sets name of the grid. Name should be a unique string with only letters and numbers.
      * @param string $name
      */
@@ -301,6 +311,23 @@ class Cubique_Grid
     }
 
     /**
+     * Sets special data for column, uses custom variables. <!column_name!> will be replaced by value of column
+     * @param  string $column
+     * @param  string $newData
+     * @return Cubique_Grid
+     */
+    public function setSpecialData($column, $newData)
+    {
+        $columns = array($column);
+        $this->_checkColumnsExistAndStrings($columns);
+        if (!is_string($newData)) {
+            $this->_typeException('string', '$newData');
+        }
+        $this->_specialData[$column] = $newData;
+        return $this;
+    }
+
+    /**
      * Returns data from the table using current grid settings.
      * Result format: 'error' => bool, 'data' => array, 'count' => 0
      * @param  array $post
@@ -371,6 +398,14 @@ class Cubique_Grid
             $columns = array_keys($this->_columns);
             foreach ($result as $key => &$row) {
                 foreach ($columns as $column) {
+                    if (array_key_exists($column, $this->_specialData)) {
+                        $newValue = $this->_specialData[$column];
+                        foreach ($columns as $specialColumn) {
+                            $customVar = $this->_specialDataSeparators[0] . $specialColumn . $this->_specialDataSeparators[1];
+                            $newValue = str_replace($customVar, $row[$specialColumn], $newValue);
+                        }
+                        $row[$column] = $newValue;
+                    }
                     if (in_array($column, $this->_columnsToEscape)) {
                         $row[$column] = $view->escape($row[$column]);
                     }
