@@ -311,7 +311,7 @@ class Cubique_Grid
     }
 
     /**
-     * Sets special data for column, uses custom variables. <!column_name!> will be replaced by value of column
+     * Sets special data for column, uses custom variables. <!column_name!> will be replaced by value of column.
      * @param  string $column
      * @param  string $newData
      * @return Cubique_Grid
