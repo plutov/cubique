@@ -7,7 +7,7 @@
  */
 
 .cubique, .cubique tbody, .cubique thead, .cubique tr, .cubique th, .cubique td {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     font-size: 12px;
     color: #333;
 }
@@ -54,9 +54,8 @@
     line-height: 16px;
     background: #fff;
     font-weight: normal;
-    margin: 0px 3px;
-    margin-top: 1px;
-    padding: 0px 8px;
+    margin: 1px 3px 0 3px;
+    padding: 0 8px;
     font-size: 12px;
     border-radius: 3px;
 }
@@ -70,8 +69,7 @@
 }
 .cubique .in-total {
     float: right;
-    margin-right: 10px;
-    margin-top: 2px;
+    margin: 2px 10px 0 0;
 }
 .cubique input {
     border: 1px solid #ccc;
@@ -89,5 +87,5 @@
     height: 12px;
     line-height: 12px;
     float: left;
-    margin: 0px 3px;
+    margin: 0 3px;
 }
