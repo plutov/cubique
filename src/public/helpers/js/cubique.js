@@ -169,7 +169,6 @@ Cubique.prototype.showData = function Cubique_showData()
 Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
 {
     var pages      = '';
-    var currClass  = '';
     var pagesCount = Math.ceil(this.count/this.rowsOnPage);
     var from       = 1;
     var to         = pagesCount;
@@ -191,7 +190,8 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
             }
         }
     }
-    for (var i = from; i <= to; i++) {
+    var i = null;
+    for (i = from; i <= to; i++) {
         pages += this.getGoToPageLink(i, i == this.currPage);
     }
     if (pagesCount > to) {
@@ -201,8 +201,9 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         pages += this.getGoToPageLink(pagesCount, false);
     }
     var select = '<select class="per-page">';
-    for (var i in this.perPageOptions) {
-        select += '<option value="' + this.perPageOptions[i] + '">' + this.perPageOptions[i] + '</option>';
+    var j = null;
+    for (j in this.perPageOptions) {
+        select += '<option value="' + this.perPageOptions[j] + '">' + this.perPageOptions[j] + '</option>';
     }
     select += '</select>';
     this.thead.append($('<tr class="pages"><th colspan="' + this.getObjectSize(this.columns) + '">' + pages + select + '<span class="in-total">' +
