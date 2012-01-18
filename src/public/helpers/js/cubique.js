@@ -113,9 +113,9 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
  */
 Cubique.prototype.showData = function Cubique_showData()
 {
-    var columnsCount = this.getObjectSize(this.columns);
-    var loading      = $('<tr><td colspan="' + columnsCount + '" class="loading">' +
-                       '<img src="/helpers/img/cubique_loading.gif"/></td></tr>');
+    var columnsCount    = this.getObjectSize(this.columns);
+    var loading         = $('<tr><td colspan="' + columnsCount + '" class="loading">.</td></tr>');
+    var loadingInterval = setInterval(function() { $('.loading').html($('.loading').html() + '.'); }, 50);
     this.tbody.html(loading);
     var local = this;
     $.ajax({
@@ -157,6 +157,7 @@ Cubique.prototype.showData = function Cubique_showData()
                 local.thead.find('.pages').remove();
                 local.renderPagesSection();
             }
+            clearInterval(loadingInterval);
             loading.remove();
         }
     });

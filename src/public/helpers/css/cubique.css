@@ -16,6 +16,7 @@
 }
 .cubique {
     width: 100%;
+    table-layout:fixed;
     border-collapse: collapse;
 }
 .cubique th, .cubique td {
@@ -42,11 +43,12 @@
     background: #f6f6f6;
 }
 .cubique td.loading {
-    height: 51px;
-    text-align: center;
-}
-.cubique td.loading img {
-    margin-top: 18px;
+    height: 41px;
+    padding-bottom: 10px;
+    font-size: 20px;
+    color: #54a3c4;
+    overflow: hidden;
+    white-space: nowrap;
 }
 .cubique a.go-to-page {
     float: left;
