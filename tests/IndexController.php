@@ -10,7 +10,7 @@ class IndexController extends Zend_Controller_Action
                 'code'        => 'Code',
                 'country'     => 'Country'
             ))
-            ->setSpecialData('name', '<a href="/?country=<!name!>"><!name!></a>')
+            ->setSpecialData('name', '<b><!name!></b>')
             ->setDefaultOrder('name')
             ->setColumnsToSort(array('name', 'code', 'country'))
             ->setColumnsToEscape(array('code'))
