@@ -87,11 +87,11 @@ class Cubique_Grid
         if (!is_string($name)) {
             $this->_typeException('string', '$name');
         }
-        if (!$name) {
+        if (empty($name)) {
             throw new Cubique_Exception('"$name" can not be empty.');
         }
-        $alnum = new Zend_Validate_Alnum();
-        if (!$alnum->isValid($name)) {
+        $alNum = new Zend_Validate_Alnum();
+        if (!$alNum->isValid($name)) {
             throw new Cubique_Exception('"$name" can contains only letters and numbers.');
         }
         $this->_name = $name;
@@ -107,7 +107,10 @@ class Cubique_Grid
         if (!is_string($table)) {
             $this->_typeException('string', '$table');
         }
-        $this->_table   = $table;
+        if (empty($table)) {
+            throw new Cubique_Exception('"$table" can not be empty.');
+        }
+        $this->_table = $table;
         return $this;
     }
 
@@ -122,15 +125,10 @@ class Cubique_Grid
             $this->_typeException('array', '$columns');
         }
         if (count($columns)) {
-            foreach ($columns as $columnName => $columnLabel) {
-                if (!is_string($columnName)) {
-                    $this->_typeException('string', '$columnName');
-                }
-                if (!is_string($columnLabel)) {
-                    $this->_typeException('string', '$columnLabel');
-                }
-            }
+            $this->_checkColumns($columns, false);
             $this->_columns = $columns;
+        } else {
+            throw new Cubique_Exception('"$columns" can not be empty.');
         }
         return $this;
     }
@@ -144,6 +142,9 @@ class Cubique_Grid
     {
         if (!is_string($order)) {
             $this->_typeException('string', '$order');
+        }
+        if (empty($order)) {
+            throw new Cubique_Exception('"$order" can not be empty.');
         }
         $this->_defaultOrder = $order;
         return $this;
@@ -174,7 +175,7 @@ class Cubique_Grid
      */
     public function setColumnsToSort($columns)
     {
-        $this->_checkColumnsExistAndStrings($columns);
+        $this->_checkColumns($columns);
         $values = array_values($columns);
         $this->_columnsToSort = array_combine($values, $values);
         return $this;
@@ -188,7 +189,7 @@ class Cubique_Grid
      */
     public function setColumnsToEscape($columns)
     {
-        $this->_checkColumnsExistAndStrings($columns);
+        $this->_checkColumns($columns);
         $values = array_values($columns);
         $this->_columnsToEscape = array_combine($values, $values);
         return $this;
@@ -202,18 +203,19 @@ class Cubique_Grid
      */
     public function setColumnsToSearch($columns)
     {
-        $this->_checkColumnsExistAndStrings($columns);
+        $this->_checkColumns($columns);
         $values = array_values($columns);
         $this->_columnsToSearch = array_combine($values, $values);
         return $this;
     }
 
     /**
-     * Checks if columns exist and have string type. Throws an exception for error.
+     * Checks if columns have string type. Throws an exception for error. Also can check if columns exist.
      * @param  mixed $columns
+     * @param  bool $mustExist
      * @return void
      */
-    private function _checkColumnsExistAndStrings($columns)
+    private function _checkColumns($columns, $mustExist = true)
     {
         if (!is_array($columns)) {
             $this->_typeException('array', '$columns');
@@ -222,7 +224,7 @@ class Cubique_Grid
             if (!is_string($column)) {
                 $this->_typeException('string', '$column');
             }
-            if (!array_key_exists($column, $this->_columns)) {
+            if ($mustExist && !array_key_exists($column, $this->_columns)) {
                 throw new Cubique_Exception('Column "' . $column . '" not found.');
             }
         }
@@ -254,7 +256,7 @@ class Cubique_Grid
     public function setJoin($column, $joinTable, $conditionColumn, $conditionJoinColumn, $selectColumn)
     {
         $columns = array($column);
-        $this->_checkColumnsExistAndStrings($columns);
+        $this->_checkColumns($columns);
         if (!is_string($joinTable)) {
             $this->_typeException('string', '$joinTable');
         }
@@ -319,7 +321,7 @@ class Cubique_Grid
     public function setSpecialData($column, $newData)
     {
         $columns = array($column);
-        $this->_checkColumnsExistAndStrings($columns);
+        $this->_checkColumns($columns);
         if (!is_string($newData)) {
             $this->_typeException('string', '$newData');
         }
