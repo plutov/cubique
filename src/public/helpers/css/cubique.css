@@ -13,6 +13,7 @@
 }
 .cubique span.order {
     color: #333;
+    font-weight: bold;
 }
 .cubique {
     width: 100%;
@@ -28,7 +29,7 @@
     text-align:  center;
 }
 .cubique th {
-    font-weight: bold;
+    font-weight: normal;
     color: #54a3c4;
     background: #e5e5e5;
 }
