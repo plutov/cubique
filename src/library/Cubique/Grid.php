@@ -347,7 +347,8 @@ class Cubique_Grid
             if (!$this->_table) {
                 throw new Cubique_Exception('"$this->_table" can not be empty.');
             }
-            $table      = new Zend_Db_Table($this->_table);
+            $table   = new Zend_Db_Table($this->_table);
+            $adapter = $table->getAdapter();
             if (!count($this->_columns)) {
                 throw new Cubique_Exception('"$this->_columns" can not be empty.');
             }
@@ -362,7 +363,7 @@ class Cubique_Grid
             $select      = $table->select()
                     ->from($this->_table, $columns)
                     ->setIntegrityCheck(false)
-                    ->limitPage($table->getAdapter()->quote($currPage), $rowsOnPage);
+                    ->limitPage($adapter->quote($currPage), $rowsOnPage);
             foreach ($this->_joins as $column => $join) {
                 $joinTable     = $join['join_table'];
                 $joinSelect    = array($column => $join['select_column']);
@@ -382,12 +383,12 @@ class Cubique_Grid
                         continue;
                     }
                     if (array_key_exists($searchColumn, $this->_joins)) {
-                        $searchColumn = '`' . $this->_joins[$searchColumn]['join_table'] . '`.`' .
-                                        $this->_joins[$searchColumn]['select_column'] . '`';
+                        $searchColumn = $this->_joins[$searchColumn]['join_table'] . '.' .
+                                        $this->_joins[$searchColumn]['select_column'];
                     } else {
-                        $searchColumn = '`' . $this->_table . '`.`' . $searchColumn . '`';
+                        $searchColumn = $this->_table . '.' . $searchColumn;
                     }
-                    $where = $table->getAdapter()->quoteInto($searchColumn . ' LIKE ?', '%' . $searchValue . '%');
+                    $where = $adapter->quoteInto($adapter->quoteIdentifier($searchColumn) . ' LIKE ?', '%' . $searchValue . '%');
                     $select->where($where);
                     $countSelect->where($where);
                 }
