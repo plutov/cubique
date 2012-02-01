@@ -79,6 +79,11 @@ class Cubique_Grid
     private $_specialData = array();
 
     /**
+     * @var array
+     */
+    private $_where = array();
+
+    /**
      * Sets name of the grid. Name should be a unique string with only letters and numbers.
      * @param string $name
      */
@@ -330,6 +335,27 @@ class Cubique_Grid
     }
 
     /**
+     * Adds permanent where statement. Please add table prefix to columns names for avoiding ambiguous errors.
+     * @param  string $where
+     * @param  bool $and
+     * @return Cubique_Grid
+     */
+    public function addWhere($where, $and = true)
+    {
+        if (!is_string($where)) {
+            $this->_typeException('string', '$where');
+        }
+        if (!is_bool($and)) {
+            $this->_typeException('bool', '$and');
+        }
+        $this->_where[] = array(
+            'string' => $where,
+            'and'    => $and
+        );
+        return $this;
+    }
+
+    /**
      * Returns data from the table using current grid settings.
      * Result format: 'error' => bool, 'data' => array, 'count' => 0
      * @param  array $post
@@ -366,6 +392,15 @@ class Cubique_Grid
                     ->from($this->_table, $columns)
                     ->setIntegrityCheck(false)
                     ->limitPage($adapter->quote($currPage), $rowsOnPage);
+            foreach ($this->_where as $where) {
+                if ($where['and']) {
+                    $select->where($where['string']);
+                    $countSelect->where($where['string']);
+                } else {
+                    $select->orWhere($where['string']);
+                    $countSelect->orWhere($where['string']);
+                }
+            }
             foreach ($this->_joins as $column => $join) {
                 $joinTable     = $join['join_table'];
                 $joinSelect    = array($column => $join['select_column']);
