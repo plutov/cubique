@@ -6,16 +6,17 @@ class IndexController extends Zend_Controller_Action
         $grid = new Cubique_Grid('province');
         $grid->setTable('province')
              ->setColumns(array(
-                 'name'        => 'Name',
-                 'code'        => 'Code',
-                 'country'     => 'Country'
+                 'name'    => 'Name',
+                 'code'    => 'Code',
+                 'country' => 'Country',
+                 'rating'  => 'Rating'
              ))
              //->setSpecialDataSeparators('<<!!', '!!>>')
              //->setSpecialData('name', '<b><<!!name!!>></b>')
              ->setDefaultOrder('name')
-             ->setColumnsToSort(array('name', 'code', 'country'))
+             ->setColumnsToSort(array('name', 'code', 'country', 'rating'))
              //->setColumnsToEscape(array('code'))
-             ->setColumnsToSearch(array('name', 'code', 'country'))
+             ->setColumnsToSearch(array('name', 'code', 'country', 'rating'))
              //->setRowsOnPage(15)
              //->logErrors(APPLICATION_PATH . '/logs/cubique')
              //->setUrl('/')
