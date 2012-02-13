@@ -85,7 +85,8 @@ class Cubique_Grid
 
     /**
      * Sets name of the grid. Name should be a unique string with only letters and numbers.
-     * @param string $name
+     * @throws Cubique_Exception
+     * @param  string $name
      */
     public function __construct($name)
     {
@@ -104,6 +105,7 @@ class Cubique_Grid
 
     /**
      * Sets table name for getting data.
+     * @throws Cubique_Exception
      * @param  string $table
      * @return Cubique_Grid
      */
@@ -121,6 +123,7 @@ class Cubique_Grid
 
     /**
      * Sets displayed columns. Array format: columnName => columnLabel.
+     * @throws Cubique_Exception
      * @param  array $columns
      * @return Cubique_Grid
      */
@@ -140,6 +143,7 @@ class Cubique_Grid
 
     /**
      * Sets default order rule.
+     * @throws Cubique_Exception
      * @param string $order
      * @return Cubique_Grid
      */
@@ -157,6 +161,7 @@ class Cubique_Grid
 
     /**
      * Sets default number of items per page.
+     * @throws Cubique_Exception
      * @param  int $rowsOnPage
      * @return Cubique_Grid
      */
@@ -216,6 +221,7 @@ class Cubique_Grid
 
     /**
      * Checks if columns have string type. Throws an exception for error. Also can check if columns exist.
+     * @throws Cubique_Exception
      * @param  mixed $columns
      * @param  bool $mustExist
      * @return void
@@ -285,6 +291,7 @@ class Cubique_Grid
 
     /**
      * Logs all exceptions of _getData() method to log file.
+     * @throws Cubique_Exception
      * @param  string $pathToLogFile
      * @return Cubique_Grid
      */
@@ -357,7 +364,8 @@ class Cubique_Grid
 
     /**
      * Returns data from the table using current grid settings.
-     * Result format: 'error' => bool, 'data' => array, 'count' => 0
+     * Result format: 'error' => bool, 'data' => array, 'count' => int.
+     * @throws Cubique_Exception
      * @param  array $post
      * @return array
      */
@@ -503,6 +511,7 @@ class Cubique_Grid
 
     /**
      * Throw type exception.
+     * @throws Cubique_Exception
      * @param  string $type
      * @param  string $variable
      * @return void
