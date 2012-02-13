@@ -342,6 +342,28 @@ class Cubique_Grid
     }
 
     /**
+     * Sets separators for method setSpecialData().
+     * @throws Cubique_Exception
+     * @param  string $open
+     * @param  string $close
+     * @return Cubique_Grid
+     */
+    public function setSpecialDataSeparators($open, $close)
+    {
+        if (!is_string($open)) {
+            $this->_typeException('string', '$open');
+        }
+        if (!is_string($close)) {
+            $this->_typeException('string', '$close');
+        }
+        if ($open == $close) {
+            throw new Cubique_Exception('Open separator shouldn\'t be equal with close separator');
+        }
+        $this->_specialDataSeparators = array($open, $close);
+        return $this;
+    }
+
+    /**
      * Adds permanent where statement. Please add table prefix to columns names for avoiding ambiguous errors.
      * @param  string $where
      * @param  bool $and
