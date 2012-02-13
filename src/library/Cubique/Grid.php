@@ -85,7 +85,7 @@ class Cubique_Grid
 
     /**
      * Sets name of the grid. Name should be a unique string with only letters and numbers.
-     * @throws Cubique_Exception
+     * @throws Cubique_InvalidArgumentException
      * @param  string $name
      */
     public function __construct($name)
@@ -94,18 +94,18 @@ class Cubique_Grid
             $this->_typeException('string', '$name');
         }
         if (empty($name)) {
-            throw new Cubique_Exception('"$name" can not be empty.');
+            throw new Cubique_InvalidArgumentException('"$name" can not be empty.');
         }
         $alNum = new Zend_Validate_Alnum();
         if (!$alNum->isValid($name)) {
-            throw new Cubique_Exception('"$name" can contains only letters and numbers.');
+            throw new Cubique_InvalidArgumentException('"$name" can contains only letters and numbers.');
         }
         $this->_name = $name;
     }
 
     /**
      * Sets table name for getting data.
-     * @throws Cubique_Exception
+     * @throws Cubique_InvalidArgumentException
      * @param  string $table
      * @return Cubique_Grid
      */
@@ -115,7 +115,7 @@ class Cubique_Grid
             $this->_typeException('string', '$table');
         }
         if (empty($table)) {
-            throw new Cubique_Exception('"$table" can not be empty.');
+            throw new Cubique_InvalidArgumentException('"$table" can not be empty.');
         }
         $this->_table = $table;
         return $this;
@@ -123,7 +123,7 @@ class Cubique_Grid
 
     /**
      * Sets displayed columns. Array format: columnName => columnLabel.
-     * @throws Cubique_Exception
+     * @throws Cubique_InvalidArgumentException
      * @param  array $columns
      * @return Cubique_Grid
      */
@@ -136,14 +136,14 @@ class Cubique_Grid
             $this->_checkColumns($columns, false);
             $this->_columns = $columns;
         } else {
-            throw new Cubique_Exception('"$columns" can not be empty.');
+            throw new Cubique_InvalidArgumentException('"$columns" can not be empty.');
         }
         return $this;
     }
 
     /**
      * Sets default order rule.
-     * @throws Cubique_Exception
+     * @throws Cubique_InvalidArgumentException
      * @param string $order
      * @return Cubique_Grid
      */
@@ -153,7 +153,7 @@ class Cubique_Grid
             $this->_typeException('string', '$order');
         }
         if (empty($order)) {
-            throw new Cubique_Exception('"$order" can not be empty.');
+            throw new Cubique_InvalidArgumentException('"$order" can not be empty.');
         }
         $this->_defaultOrder = $order;
         return $this;
@@ -161,7 +161,7 @@ class Cubique_Grid
 
     /**
      * Sets default number of items per page.
-     * @throws Cubique_Exception
+     * @throws Cubique_InvalidArgumentException
      * @param  int $rowsOnPage
      * @return Cubique_Grid
      */
@@ -171,7 +171,7 @@ class Cubique_Grid
             $this->_typeException('int', '$rowsOnPage');
         }
         if ($rowsOnPage <= 0) {
-            throw new Cubique_Exception('Invalid value for "$rowsOnPage".');
+            throw new Cubique_InvalidArgumentException('Invalid value for "$rowsOnPage".');
         }
         $this->_rowsOnPage = $rowsOnPage;
         return $this;
@@ -533,13 +533,13 @@ class Cubique_Grid
 
     /**
      * Throw type exception.
-     * @throws Cubique_Exception
+     * @throws Cubique_InvalidArgumentException
      * @param  string $type
      * @param  string $variable
      * @return void
      */
     private function _typeException($type, $variable)
     {
-        throw new Cubique_Exception(ucfirst($type) . ' expected for "' . $variable . '".');
+        throw new Cubique_InvalidArgumentException(ucfirst($type) . ' expected for "' . $variable . '".');
     }
 }
