@@ -398,10 +398,10 @@ class Cubique_Grid
                 throw new Cubique_Exception('Invalid post data');
             }
             $cubique    = $post['cubique'];
-            $currPage   = intval($cubique['curr_page']);
-            $sort       = $cubique['sort'];
-            $search     = $cubique['search'];
-            $rowsOnPage = intval($cubique['rows_on_page']);
+            $currPage   = isset($cubique['curr_page']) ? intval($cubique['curr_page']) : 1;
+            $sort       = isset($cubique['sort']) ? $cubique['sort'] : '';
+            $search     = isset($cubique['search']) ? $cubique['search'] : array();
+            $rowsOnPage = isset($cubique['rows_on_page']) ? intval($cubique['rows_on_page']) : $this->_rowsOnPage;
             if (!$this->_table) {
                 throw new Cubique_Exception('"$this->_table" can not be empty.');
             }
