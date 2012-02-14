@@ -38,6 +38,7 @@ Cubique = function(options)
     for (var j in perPagesOptions) {
         this.perPageOptions[perPagesOptions[j]] = perPagesOptions[j];
     }
+    this.searchValues = {};
     this.renderGrid();
     this.showData();
 }
@@ -59,7 +60,6 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         html += '<th>' + column + '</th>';
     }
     html += '</tr>';
-    var inputValues = {};
     var searchType = '<select class="search-type"></select>';
     if (this.getObjectSize(this.columnsToSearch)) {
         html += '<tr>';
@@ -74,7 +74,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
                          '<option value=">=">>=</option>' +
                          '</select>';
                 column         += '<input type="text" data-column="' + j + '" placeholder="search"/>';
-                inputValues[j] = '';
+                this.searchValues[j] = '';
             } else {
                 column = '';
             }
@@ -100,11 +100,11 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         return false;
     });
     $('#cubique-' + this.name + ' input').keyup(function() {
-        inputValues = local.makeSearch($(this), $(this).prev('select'), inputValues);
+        local.makeSearch($(this), $(this).prev('select'));
         return false;
     });
     $('#cubique-' + this.name + ' .search-type').change(function() {
-        inputValues = local.makeSearch($(this).next('input'), $(this), inputValues);
+        local.makeSearch($(this).next('input'), $(this));
         return false;
     });
     this.tbody = $('#cubique-' + this.name + ' tbody');
@@ -272,19 +272,16 @@ Cubique.prototype.isLocalStorageAvailable = function Cubique_isLocalStorageAvail
  * Sets search data and makes AJAX request.
  * @param  value object
  * @param  type object
- * @param  inputValues object
- * @return object
+ * @return void
  */
-Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type, inputValues)
+Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type)
 {
-    var local        = this;
     var searchColumn = value.attr('data-column');
-    var search       = [value.val(), type.val()]
-    if (inputValues[searchColumn] != search) {
-        local.search[searchColumn] = search;
-        inputValues[searchColumn]  = search;
-        local.currPage = 1;
-        local.showData();
+    var search       = [value.val(), type.val()];
+    if (this.searchValues[searchColumn] != search) {
+        this.search[searchColumn] = search;
+        this.searchValues[searchColumn]  = search;
+        this.currPage = 1;
+        this.showData();
     }
-    return inputValues;
 }
