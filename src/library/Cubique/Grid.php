@@ -446,13 +446,13 @@ class Cubique_Grid
             }
             if ($search) {
                 foreach ($search as $searchColumn => $searchArray) {
-                    if (!$searchArray || !isset($searchArray[0]) || !isset($searchArray[1])) {
+                    if (!isset($searchArray[0]) || !isset($searchArray[1])) {
                         continue;
                     }
                     $searchValue = $searchArray[0];
                     $searchType  = $searchArray[1];
-                    // Invalid search condition.
-                    if (!in_array($searchType, array('LIKE', '=', '<>', '<', '>', '<=', '>='))) {
+                    // Invalid search condition or empty.
+                    if (!$searchValue || !$searchType || !in_array($searchType, array('LIKE', '=', '<>', '<', '>', '<=', '>='))) {
                         continue;
                     }
                     $searchWrapper = ''; // Percents for LIKE.
