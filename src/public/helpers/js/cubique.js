@@ -60,11 +60,20 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     }
     html += '</tr>';
     var inputValues = {};
+    var searchType = '<select class="search-type"></select>';
     if (this.getObjectSize(this.columnsToSearch)) {
         html += '<tr>';
         for (var j in this.columns) {
             if (typeof(this.columnsToSearch[j]) != 'undefined') {
-                column         = '<input type="text" data-column="' + j + '" placeholder="search"/>';
+                column = '<select class="search-type"><option value="LIKE">LIKE</option>' +
+                         '<option value="=">=</option>' +
+                         '<option value="<>"><></option>' +
+                         '<option value="<"><</option>' +
+                         '<option value=">">></option>' +
+                         '<option value="<="><=</option>' +
+                         '<option value=">=">>=</option>' +
+                         '</select>';
+                column         += '<input type="text" data-column="' + j + '" placeholder="search"/>';
                 inputValues[j] = '';
             } else {
                 column = '';
@@ -90,17 +99,12 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         local.showData();
         return false;
     });
-    var searchColumn = null;
-    var searchVal    = '';
     $('#cubique-' + this.name + ' input').keyup(function() {
-        searchColumn = $(this).attr('data-column');
-        searchVal    = $(this).val();
-        if (inputValues[searchColumn] != searchVal) {
-            local.search[searchColumn] = searchVal;
-            inputValues[searchColumn]  = searchVal;
-            local.currPage = 1;
-            local.showData();
-        }
+        inputValues = local.makeSearch($(this), $(this).prev('select'), inputValues);
+        return false;
+    });
+    $('#cubique-' + this.name + ' .search-type').change(function() {
+        inputValues = local.makeSearch($(this).next('input'), $(this), inputValues);
         return false;
     });
     this.tbody = $('#cubique-' + this.name + ' tbody');
@@ -262,4 +266,25 @@ Cubique.prototype.isLocalStorageAvailable = function Cubique_isLocalStorageAvail
     } catch (e) {
         return false;
     }
+}
+
+/**
+ * Sets search data and makes AJAX request.
+ * @param  value object
+ * @param  type object
+ * @param  inputValues object
+ * @return object
+ */
+Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type, inputValues)
+{
+    var local        = this;
+    var searchColumn = value.attr('data-column');
+    var search       = [value.val(), type.val()]
+    if (inputValues[searchColumn] != search) {
+        local.search[searchColumn] = search;
+        inputValues[searchColumn]  = search;
+        local.currPage = 1;
+        local.showData();
+    }
+    return inputValues;
 }

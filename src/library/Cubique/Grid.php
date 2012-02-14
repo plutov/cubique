@@ -445,9 +445,19 @@ class Cubique_Grid
                 $select->order($this->_defaultOrder);
             }
             if ($search) {
-                foreach ($search as $searchColumn => $searchValue) {
-                    if (!$searchValue) {
+                foreach ($search as $searchColumn => $searchArray) {
+                    if (!$searchArray || !isset($searchArray[0]) || !isset($searchArray[1])) {
                         continue;
+                    }
+                    $searchValue = $searchArray[0];
+                    $searchType  = $searchArray[1];
+                    // Invalid search condition.
+                    if (!in_array($searchType, array('LIKE', '=', '<>', '<', '>', '<=', '>='))) {
+                        continue;
+                    }
+                    $searchWrapper = ''; // Percents for LIKE.
+                    if ($searchType == 'LIKE') {
+                        $searchWrapper = '%';
                     }
                     if (array_key_exists($searchColumn, $this->_joins)) {
                         $searchColumn = $this->_joins[$searchColumn]['join_table'] . '.' .
@@ -455,7 +465,7 @@ class Cubique_Grid
                     } else {
                         $searchColumn = $this->_table . '.' . $searchColumn;
                     }
-                    $where = $adapter->quoteInto($adapter->quoteIdentifier($searchColumn) . ' LIKE ?', '%' . $searchValue . '%');
+                    $where = $adapter->quoteInto($adapter->quoteIdentifier($searchColumn) . ' ' . $searchType . ' ?', $searchWrapper . $searchValue . $searchWrapper);
                     $select->where($where);
                     $countSelect->where($where);
                 }

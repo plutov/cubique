@@ -75,16 +75,23 @@
     margin: 2px 10px 0 0;
 }
 .cubique input {
+    width: 100px;
     border: 1px solid #ccc;
     padding-left: 3px;
     border-radius: 3px;
 }
-.cubique select.per-page {
-    float: right;
+.cubique select {
     height: 18px;
     font-size: 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
+}
+.cubique select.per-page {
+    float: right;
+}
+.cubique select.search-type {
+    float: left;
+    margin: 3px 3px 0px 0px;
 }
 .cubique span.more {
     height: 12px;
