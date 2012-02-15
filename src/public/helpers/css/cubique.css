@@ -93,6 +93,10 @@
     float: left;
     margin: 3px 3px 0px 0px;
 }
+.cubique a.reset-search {
+    text-decoration: none;
+    color: inherit;
+}
 .cubique span.more {
     height: 12px;
     line-height: 12px;

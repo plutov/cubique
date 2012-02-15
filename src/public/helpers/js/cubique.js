@@ -72,8 +72,9 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
                          '<option value=">">></option>' +
                          '<option value="<="><=</option>' +
                          '<option value=">=">>=</option>' +
-                         '</select>';
-                column         += '<input type="text" data-column="' + j + '" placeholder="search"/>';
+                         '</select>' +
+                         '<input type="text" data-column="' + j + '" placeholder="search"/> ' +
+                         '<a href="#" class="reset-search">&times</a>';
                 this.searchValues[j] = '';
             } else {
                 column = '';
@@ -105,6 +106,14 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     });
     $('#cubique-' + this.name + ' .search-type').change(function() {
         local.makeSearch($(this).next('input'), $(this));
+        return false;
+    });
+    $('.reset-search').click(function() {
+        var input  = $(this).prev();
+        var select = input.prev();
+        input.val(null);
+        select.val('LIKE');
+        local.makeSearch(input, select);
         return false;
     });
     this.tbody = $('#cubique-' + this.name + ' tbody');
