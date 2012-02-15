@@ -411,7 +411,7 @@ class Cubique_Grid
      * @param  array $post
      * @return array
      */
-    protected function _getData($post)
+    private function _getData($post)
     {
         try {
             if (!isset($post['cubique'])) {
