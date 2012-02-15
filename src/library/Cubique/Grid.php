@@ -365,23 +365,43 @@ class Cubique_Grid
 
     /**
      * Adds permanent where statement. Please add table prefix to columns names for avoiding ambiguous errors.
+     * If not the first method adds "AND" before statement.
      * @param  string $where
-     * @param  bool $and
      * @return Cubique_Grid
      */
-    public function addWhere($where, $and = true)
+    public function addWhere($where)
+    {
+        $this->_addWhere($where, true);
+        return $this;
+    }
+
+    /**
+     * Adds permanent where statement. Please add table prefix to columns names for avoiding ambiguous errors.
+     * If not the first method adds "OR" before statement.
+     * @param  string $where
+     * @return Cubique_Grid
+     */
+    public function addOrWhere($where)
+    {
+        $this->_addWhere($where, false);
+        return $this;
+    }
+
+    /**
+     * Abstract method for adding WHERE statement.
+     * @param  string $where
+     * @param  bool $and
+     * @return void
+     */
+    private function _addWhere($where, $and)
     {
         if (!is_string($where)) {
             $this->_typeException('string', '$where');
-        }
-        if (!is_bool($and)) {
-            $this->_typeException('bool', '$and');
         }
         $this->_where[] = array(
             'string' => $where,
             'and'    => $and
         );
-        return $this;
     }
 
     /**
@@ -536,8 +556,8 @@ class Cubique_Grid
     {
         $request = Zend_Controller_Front::getInstance()->getRequest();
         if ($request->isXmlHttpRequest()) {
-            $jsonHelper = Zend_Controller_Action_HelperBroker::getStaticHelper('json');
-            $jsonHelper->sendJson($this->_getData($request->getPost()));
+            Zend_Controller_Action_HelperBroker::getStaticHelper('json')
+                ->sendJson($this->_getData($request->getPost()));
         }
     }
 

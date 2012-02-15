@@ -22,7 +22,7 @@ class IndexController extends Zend_Controller_Action
              //->setUrl('/')
              //->setErrorMessage('Error!')
              //->addWhere('country.name LIKE "A%"')
-             //->addWhere('province.code LIKE "A%"', false)
+             //->addOrWhere('province.code LIKE "A%"')
              ->setJoin('country', 'country', 'country_id', 'id', 'name');
         $grid->dispatch();
         $this->view->grid = $grid;
