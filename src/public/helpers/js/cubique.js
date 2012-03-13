@@ -31,7 +31,20 @@ Cubique = function(options)
                 this.currPage = currPageLS;
             }
         } else {
-            localStorage.setItem(this.name + '_rowsOnPage', 10);
+            localStorage.setItem(this.name + '_rowsOnPage', this.rowsOnPage);
+            localStorage.setItem(this.name + '_currPage', this.currPage);
+        }
+    } else {
+        var rowsOnPageLS = parseInt(this.getCookie(this.name + '_rowsOnPage'));
+        var currPageLS   = parseInt(this.getCookie(this.name + '_currPage'));
+        if (rowsOnPageLS && $.inArray(rowsOnPageLS, perPagesOptions) != -1) {
+            this.rowsOnPage = rowsOnPageLS;
+            if (currPageLS) {
+                this.currPage = currPageLS;
+            }
+        } else {
+            this.setCookie(this.name + '_rowsOnPage', this.rowsOnPage);
+            this.setCookie(this.name + '_currPage', this.currPage);
         }
     }
     this.perPageOptions  = {};
@@ -227,6 +240,8 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         local.currPage = parseInt($(this).attr('data-number'));
         if (local.isLocalStorageAvailable()) {
             localStorage.setItem(local.name + '_currPage', local.currPage);
+        } else {
+            local.setCookie(local.name + '_currPage', local.currPage);
         }
         local.showData();
         return false;
@@ -236,6 +251,9 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         if (local.isLocalStorageAvailable()) {
             localStorage.setItem(local.name + '_rowsOnPage', local.rowsOnPage);
             localStorage.setItem(local.name + '_currPage', 1);
+        } else {
+            local.setCookie(local.name + '_rowsOnPage', local.rowsOnPage);
+            local.setCookie(local.name + '_currPage', 1);
         }
         local.currPage   = 1;
         local.showData();
@@ -293,4 +311,44 @@ Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type)
         this.currPage = 1;
         this.showData();
     }
+}
+
+/**
+ * Sets cookie value.
+ * @param  name string
+ * @param  value string|number
+ * @return void
+ */
+Cubique.prototype.setCookie = function Cubique_setCookie(name, value)
+{
+    var now    = new Date();
+    var expire = new Date();
+    expire.setTime(now.getTime() + 3600000 * 24 * 10); // Just 10 days
+    document.cookie = name + '=' + value + ';expires=' + expire.toGMTString() + ';path=/';
+}
+
+/**
+ * Returns cookie value or empty string.
+ * @param  name string
+ * @return string
+ */
+Cubique.prototype.getCookie = function Cubique_getCookie(name)
+{
+    var cookie = ' ' + document.cookie;
+    var search = ' ' + name + '=';
+    var value = '';
+    var offset = 0;
+    var end = 0;
+    if (cookie.length > 0) {
+        offset = cookie.indexOf(search);
+        if (offset != -1) {
+            offset += search.length;
+            end = cookie.indexOf(';', offset);
+            if (end == -1) {
+                end = cookie.length;
+            }
+            value = cookie.substring(offset, end);
+        }
+    }
+    return(value);
 }
