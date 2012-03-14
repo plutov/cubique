@@ -87,7 +87,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
                          '<option value=">=">>=</option>' +
                          '</select>' +
                          '<input type="text" data-column="' + j + '" placeholder="search"/> ' +
-                         '<a href="#" class="reset-search">&times</a>';
+                         '<a href="#" class="reset-search">&times;</a>';
                 this.searchValues[j] = '';
             } else {
                 column = '';
@@ -109,7 +109,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         local.currPage = 1;
         local.sort     = sortColumn + ' ' + sortOrder;
         $(this).attr('data-order', sortOrder == 'ASC' ? 'DESC' : 'ASC');
-        $(this).prev('span').html(sortOrder == 'ASC' ? '&darr;' : '&uarr;');
+        $(this).prev('span').html(sortOrder == 'ASC' ? '&#9660;' : '&#9650;');
         local.showData();
         return false;
     });
@@ -121,7 +121,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         local.makeSearch($(this).next('input'), $(this));
         return false;
     });
-    $('.reset-search').click(function() {
+    $('#cubique-' + this.name + ' .reset-search').click(function() {
         var input  = $(this).prev();
         var select = input.prev();
         input.val(null);
@@ -234,7 +234,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         select += '<option value="' + this.perPageOptions[j] + '">' + this.perPageOptions[j] + '</option>';
     }
     select += '</select>';
-    this.thead.append($('<tr class="pages"><th colspan="' + this.getObjectSize(this.columns) + '">' + pages + select + '<span class="in-total">' +
+    this.thead.append($('<tr class="pages"><th colspan="' + this.getObjectSize(this.columns) + '">' + pages + '<a href="#" class="refresh">refresh</a>' + select + '<span class="in-total">' +
                this.count + ' in total</span></th></tr>'));
     var local = this;
     this.thead.find('.go-to-page').click(function() {
@@ -260,6 +260,10 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         local.showData();
         return false;
     }).val(this.rowsOnPage);
+    this.thead.find('.refresh').click(function() {
+        local.showData();
+        return false;
+    });
 }
 
 Cubique.prototype.getGoToPageLink = function Cubique_getGoToPageLink(pageNumber, isCurrent)
