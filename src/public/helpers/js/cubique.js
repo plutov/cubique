@@ -144,6 +144,7 @@ Cubique.prototype.showData = function Cubique_showData()
     var loadingInterval = setInterval(function() { $('.loading').html($('.loading').html() + '.'); }, 50);
     this.tbody.html(loading);
     var local = this;
+    var date = new Date();
     $.ajax({
         type: 'post',
         data: {
@@ -155,7 +156,7 @@ Cubique.prototype.showData = function Cubique_showData()
                 rows_on_page: local.rowsOnPage
             }
         },
-        url: local.url ? local.url : location.href,
+        url: (local.url ? local.url : location.href) + '?nocache=' + date.getTime(),
         dataType: 'json',
         success:  function(response) {
             if (response.error) {
