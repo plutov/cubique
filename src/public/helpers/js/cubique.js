@@ -14,44 +14,41 @@
 Cubique = function(options)
 {
     $.extend(this, options);
-    this.count          = 0;
-    this.currPage       = 1;
-    this.sort           = '';
-    this.search         = {};
+    this.count        = 0;
+    this.currPage     = 1;
+    this.sort         = '';
+    this.search       = {};
+    this.searchValues = {};
     var perPagesOptions = [10, 25, 50, 100];
     perPagesOptions.push(this.rowsOnPage);
     perPagesOptions.sort(function(a,b){return a-b;});
     perPagesOptions.join();
-    if (this.isLocalStorageAvailable()) {
-        var rowsOnPageLS = parseInt(localStorage.getItem(this.name + '_rowsOnPage'));
-        var currPageLS   = parseInt(localStorage.getItem(this.name + '_currPage'));
-        if (rowsOnPageLS && $.inArray(rowsOnPageLS, perPagesOptions) != -1) {
-            this.rowsOnPage = rowsOnPageLS;
-            if (currPageLS) {
-                this.currPage = currPageLS;
-            }
-        } else {
-            localStorage.setItem(this.name + '_rowsOnPage', this.rowsOnPage);
-            localStorage.setItem(this.name + '_currPage', this.currPage);
+    var rowsOnPageState = parseInt(this.getState('rowsOnPage'));
+    var currPageState   = parseInt(this.getState('currPage'));
+    var sortColumnState = this.getState('sortColumn');
+    var sortOrderState  = this.getState('sortOrder');
+    var local = this;
+    var searchState     = $.parseJSON(local.getState('search'));
+    if (sortColumnState && sortOrderState) {
+        this.sort = sortColumnState + ' ' + sortOrderState;
+    }
+    if (rowsOnPageState && $.inArray(rowsOnPageState, perPagesOptions) != -1) {
+        this.rowsOnPage = rowsOnPageState;
+        if (currPageState) {
+            this.currPage = currPageState;
         }
     } else {
-        var rowsOnPageLS = parseInt(this.getCookie(this.name + '_rowsOnPage'));
-        var currPageLS   = parseInt(this.getCookie(this.name + '_currPage'));
-        if (rowsOnPageLS && $.inArray(rowsOnPageLS, perPagesOptions) != -1) {
-            this.rowsOnPage = rowsOnPageLS;
-            if (currPageLS) {
-                this.currPage = currPageLS;
-            }
-        } else {
-            this.setCookie(this.name + '_rowsOnPage', this.rowsOnPage);
-            this.setCookie(this.name + '_currPage', this.currPage);
-        }
+        this.setState('rowsOnPage', this.rowsOnPage);
+        this.setState('currPage', this.currPage);
+    }
+    if (searchState) {
+        this.search = searchState;
     }
     this.perPageOptions  = {};
     for (var j in perPagesOptions) {
         this.perPageOptions[perPagesOptions[j]] = perPagesOptions[j];
     }
-    this.searchValues = {};
+
     this.renderGrid();
     this.showData();
 }
@@ -64,9 +61,15 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
 {
     var html   = '<table class="cubique"><thead><tr>';
     var column = '';
+    var sortColumnState = this.getState('sortColumn');
+    var sortOrderState  = this.getState('sortOrder');
+    var spanValue       = '';
+    var dataOrder       = 'ASC';
     for (var i in this.columns) {
         if (typeof(this.columnsToSort[i]) != 'undefined') {
-            column = '<span class="order"></span> <a href="#" class="sort-by" data-column="' + i + '" data-order="ASC">' + this.columns[i] + '</a>';
+            spanValue = (sortColumnState == this.columnsToSort[i]) ? (sortOrderState == 'ASC' ? '&#9660' : '&#9650') : '';
+            dataOrder = (sortColumnState == this.columnsToSort[i]) ? (sortOrderState == 'ASC' ? 'DESC' : 'ASC') : 'ASC';
+            column = '<span class="order">' + spanValue + '</span> <a href="#" class="sort-by" data-column="' + i + '" data-order="' + dataOrder + '">' + this.columns[i] + '</a>';
         } else {
             column = this.columns[i];
         }
@@ -76,19 +79,28 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     var searchType = '<select class="search-type"></select>';
     if (this.getObjectSize(this.columnsToSearch)) {
         html += '<tr>';
+        var searchValue = '';
+        var tempSearchType = '';
         for (var j in this.columns) {
             if (typeof(this.columnsToSearch[j]) != 'undefined') {
-                column = '<select class="search-type"><option value="LIKE">LIKE</option>' +
-                         '<option value="=">=</option>' +
-                         '<option value="<>"><></option>' +
-                         '<option value="<"><</option>' +
-                         '<option value=">">></option>' +
-                         '<option value="<="><=</option>' +
-                         '<option value=">=">>=</option>' +
+                searchValue = (typeof(this.search[j]) != 'undefined') ? this.search[j][0] : '';
+                tempSearchType = (typeof(this.search[j]) != 'undefined') ? this.search[j][1] : '';
+                column = '<select class="search-type">' +
+                         '<option value="LIKE"' + (tempSearchType == 'LIKE' ? ' selected=selected' : '') + '>LIKE</option>' +
+                         '<option value="="' + (tempSearchType == '=' ? ' selected=selected' : '') + '>=</option>' +
+                         '<option value="<>"' + (tempSearchType == '<>' ? ' selected=selected' : '') + '><></option>' +
+                         '<option value="<"' + (tempSearchType == '<' ? ' selected=selected' : '') + '><</option>' +
+                         '<option value=">"' + (tempSearchType == '>' ? ' selected=selected' : '') + '>></option>' +
+                         '<option value="<="' + (tempSearchType == '<=' ? ' selected=selected' : '') + '><=</option>' +
+                         '<option value=">="' + (tempSearchType == '>=' ? ' selected=selected' : '') + '>>=</option>' +
                          '</select>' +
-                         '<input type="text" data-column="' + j + '" placeholder="search"/> ' +
+                         '<input type="text" data-column="' + j + '" placeholder="search" value="' + searchValue + '"/> ' +
                          '<a href="#" class="reset-search">&times;</a>';
-                this.searchValues[j] = '';
+                if (typeof(this.search[j]) != 'undefined') {
+                    this.searchValues[j] = this.search[j];
+                } else {
+                    this.searchValues[j] = '';
+                }
             } else {
                 column = '';
             }
@@ -108,6 +120,9 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         sortColumn     = $(this).attr('data-column');
         local.currPage = 1;
         local.sort     = sortColumn + ' ' + sortOrder;
+        local.setState('currPage', 1);
+        local.setState('sortColumn', sortColumn);
+        local.setState('sortOrder', sortOrder);
         $(this).attr('data-order', sortOrder == 'ASC' ? 'DESC' : 'ASC');
         $(this).prev('span').html(sortOrder == 'ASC' ? '&#9660;' : '&#9650;');
         local.showData();
@@ -241,23 +256,14 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
     var local = this;
     this.thead.find('.go-to-page').click(function() {
         local.currPage = parseInt($(this).attr('data-number'));
-        if (local.isLocalStorageAvailable()) {
-            localStorage.setItem(local.name + '_currPage', local.currPage);
-        } else {
-            local.setCookie(local.name + '_currPage', local.currPage);
-        }
+        local.setState('currPage', local.currPage);
         local.showData();
         return false;
     });
     this.thead.find('.per-page').change(function() {
         local.rowsOnPage = $(this).val();
-        if (local.isLocalStorageAvailable()) {
-            localStorage.setItem(local.name + '_rowsOnPage', local.rowsOnPage);
-            localStorage.setItem(local.name + '_currPage', 1);
-        } else {
-            local.setCookie(local.name + '_rowsOnPage', local.rowsOnPage);
-            local.setCookie(local.name + '_currPage', 1);
-        }
+        local.setState('rowsOnPage', local.rowsOnPage);
+        local.setState('currPage', 1);
         local.currPage   = 1;
         local.showData();
         return false;
@@ -328,6 +334,8 @@ Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type)
     var search       = [value.val(), type.val()];
     if (this.searchValues[searchColumn] != search) {
         this.search[searchColumn] = search;
+        this.setState('currPage', 1);
+        this.setState('search', this.stringify(this.search));
         this.searchValues[searchColumn]  = search;
         this.currPage = 1;
         this.showData();
@@ -408,5 +416,36 @@ Cubique.prototype.stringify = function Cubique_stringify(obj)
         }
 
         return (arr ? '[' : '{') + String(json) + (arr ? ']' : '}');
+    }
+}
+
+/**
+ * Returns key value from local storage or cookies.
+ * @param  key string
+ * @return string
+ */
+Cubique.prototype.getState = function Cubique_getState(key)
+{
+    key = this.name + '_' + key;
+    if (this.isLocalStorageAvailable()) {
+        return localStorage.getItem(key);
+    } else {
+        return this.getCookie(key);
+    }
+}
+
+/**
+ * Sets value of state in local storage or cookies.
+ * @param  key string
+ * @param  value string
+ * @return void
+ */
+Cubique.prototype.setState = function Cubique_setState(key, value)
+{
+    key = this.name + '_' + key;
+    if (this.isLocalStorageAvailable()) {
+        localStorage.setItem(key, value);
+    } else {
+        this.setCookie(key, value);
     }
 }
