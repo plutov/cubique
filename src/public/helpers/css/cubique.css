@@ -103,7 +103,7 @@
     float: left;
     margin: 0 3px;
 }
-.cubique .refresh {
+.cubique .refresh, .cubique .csv {
     float: right;
     color: #54a3c4;
     margin: 2px 2px 0px 2px;

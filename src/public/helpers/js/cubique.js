@@ -234,8 +234,10 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         select += '<option value="' + this.perPageOptions[j] + '">' + this.perPageOptions[j] + '</option>';
     }
     select += '</select>';
-    this.thead.append($('<tr class="pages"><th colspan="' + this.getObjectSize(this.columns) + '">' + pages + '<a href="#" class="refresh">refresh</a>' + select + '<span class="in-total">' +
-               this.count + ' in total</span></th></tr>'));
+    this.thead.append($('<tr class="pages"><th colspan="' + this.getObjectSize(this.columns) + '">' + pages +
+                        '<a href="#" class="csv">csv</a>' +
+                        '<a href="#" class="refresh">refresh</a>' + select + '<span class="in-total">' +
+                        this.count + ' in total</span></th></tr>'));
     var local = this;
     this.thead.find('.go-to-page').click(function() {
         local.currPage = parseInt($(this).attr('data-number'));
@@ -262,6 +264,20 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
     }).val(this.rowsOnPage);
     this.thead.find('.refresh').click(function() {
         local.showData();
+        return false;
+    });
+    this.thead.find('.csv').click(function() {
+        data = {
+            cubique: {
+                name:         local.name,
+                curr_page:    local.currPage,
+                sort:         local.sort,
+                search:       local.search,
+                rows_on_page: local.rowsOnPage
+            }
+        };
+        data = local.stringify(data);
+        document.location.href = (local.url ? local.url : location.href) + '?cubique_data=' + encodeURIComponent(data);
         return false;
     });
 }
@@ -356,4 +372,41 @@ Cubique.prototype.getCookie = function Cubique_getCookie(name)
         }
     }
     return(value);
+}
+
+/**
+ * Returns JSON string.
+ * @param   obj object
+ * @return  string
+ */
+Cubique.prototype.stringify = function Cubique_stringify(obj)
+{
+    if ('JSON' in window) {
+        return JSON.stringify(obj);
+    }
+
+    var t = typeof (obj);
+    if (t != 'object' || obj === null) {
+        if (t == 'string') {
+            obj = '"' + obj + '"';
+        }
+        return String(obj);
+    } else {
+        var n, v, json = [], arr = (obj && obj.constructor == Array);
+        for (n in obj) {
+            v = obj[n];
+            t = typeof(v);
+            if (obj.hasOwnProperty(n)) {
+                if (t == 'string') {
+                    v = '"' + v + '"';
+                } else if (t == 'object' && v !== null) {
+                    v = this.stringify(v);
+                }
+
+                json.push((arr ? "" : '"' + n + '":') + String(v));
+            }
+        }
+
+        return (arr ? '[' : '{') + String(json) + (arr ? ']' : '}');
+    }
 }

@@ -84,6 +84,14 @@ class Cubique_Grid
     private $_where = array();
 
     /**
+     * @var array
+     */
+    private $_csvDelimiters = array(
+        'field' => ',',
+        'line'  => "\n"
+    );
+
+    /**
      * Sets name of the grid. Name should be a unique string with only letters and numbers.
      * @throws Cubique_InvalidArgumentException
      * @param  string $name
@@ -558,6 +566,25 @@ class Cubique_Grid
         if ($request->isXmlHttpRequest()) {
             Zend_Controller_Action_HelperBroker::getStaticHelper('json')
                 ->sendJson($this->_getData($request->getPost()));
+        } elseif ($request->getParam('cubique_data')) {
+            $data = $this->_getData(Zend_Json_Decoder::decode(urldecode($request->getParam('cubique_data'))));
+            if (!$data['error']) {
+                Zend_Layout::getMvcInstance()->disableLayout();
+                Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->setNoRender(true);
+                header('Content-Description: File Transfer');
+                header('Content-Type: text/csv; charset=utf-8');
+                header('Content-Disposition: attachment; filename=' . $this->_name . '_' . uniqid() . '.csv');
+                header('Content-Transfer-Encoding: binary');
+                header('Expires: 0');
+                header('Cache-control: private, must-revalidate');
+                header("Pragma: public");
+                $csv = implode($this->_csvDelimiters['field'], $this->_columns);
+                foreach ($data['data'] as $item) {
+                    $csv .= $this->_csvDelimiters['line'] . implode($this->_csvDelimiters['field'], $item);
+                }
+                echo $csv;
+                exit();
+            }
         }
     }
 
