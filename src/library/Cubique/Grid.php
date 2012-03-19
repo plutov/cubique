@@ -480,11 +480,11 @@ class Cubique_Grid
                     $searchValue = $searchArray[0];
                     $searchType  = $searchArray[1];
                     // Invalid search condition or empty.
-                    if (!$searchValue || !$searchType || !in_array($searchType, array('LIKE', '=', '<>', '<', '>', '<=', '>='))) {
+                    if (!$searchValue || !$searchType || !in_array($searchType, array('LIKE', 'NOT LIKE', '=', '<>', '<', '>', '<=', '>='))) {
                         continue;
                     }
                     $searchWrapper = ''; // Percents for LIKE.
-                    if ($searchType == 'LIKE') {
+                    if ($searchType == 'LIKE' || $searchType == 'NOT LIKE') {
                         $searchWrapper = '%';
                     }
                     if (array_key_exists($searchColumn, $this->_joins)) {

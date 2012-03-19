@@ -81,28 +81,20 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         html += '<tr>';
         var searchValue = '';
         var tempSearchType = '';
+        var conditions     = ['LIKE', 'NOT LIKE', '=', '<>', '<', '>', '<=', '>='];
         for (var j in this.columns) {
+            column = '';
             if (typeof(this.columnsToSearch[j]) != 'undefined') {
                 searchValue = (typeof(this.search[j]) != 'undefined') ? this.search[j][0] : '';
                 tempSearchType = (typeof(this.search[j]) != 'undefined') ? this.search[j][1] : '';
-                column = '<select class="search-type">' +
-                         '<option value="LIKE"' + (tempSearchType == 'LIKE' ? ' selected=selected' : '') + '>LIKE</option>' +
-                         '<option value="="' + (tempSearchType == '=' ? ' selected=selected' : '') + '>=</option>' +
-                         '<option value="<>"' + (tempSearchType == '<>' ? ' selected=selected' : '') + '><></option>' +
-                         '<option value="<"' + (tempSearchType == '<' ? ' selected=selected' : '') + '><</option>' +
-                         '<option value=">"' + (tempSearchType == '>' ? ' selected=selected' : '') + '>></option>' +
-                         '<option value="<="' + (tempSearchType == '<=' ? ' selected=selected' : '') + '><=</option>' +
-                         '<option value=">="' + (tempSearchType == '>=' ? ' selected=selected' : '') + '>>=</option>' +
-                         '</select>' +
-                         '<input type="text" data-column="' + j + '" placeholder="search" value="' + searchValue + '"/> ' +
-                         '<a href="#" class="reset-search">&times;</a>';
-                if (typeof(this.search[j]) != 'undefined') {
-                    this.searchValues[j] = this.search[j];
-                } else {
-                    this.searchValues[j] = '';
+                column += '<select class="search-type">';
+                for (var k in conditions) {
+                    column += '<option value="' + conditions[k] + '"' + (tempSearchType == '' + conditions[k] + '' ? ' selected=selected' : '') + '>' + conditions[k] + '</option>';
                 }
-            } else {
-                column = '';
+                column += '</select>' +
+                          '<input type="text" data-column="' + j + '" placeholder="search" value="' + searchValue + '"/> ' +
+                          '<a href="#" class="reset-search">&times;</a>';
+                this.searchValues[j] = (typeof(this.search[j]) != 'undefined') ? this.search[j] : '';
             }
             html += '<th>' + column + '</th>';
         }
