@@ -19,6 +19,11 @@ Cubique = function(options)
     this.sort         = '';
     this.search       = {};
     this.searchValues = {};
+    try {
+        this.isLocalStorageAvailable = 'localStorage' in window && window['localStorage'] !== null;
+    } catch (e) {
+        this.isLocalStorageAvailable = false;
+    }
     var perPagesOptions = [10, 25, 50, 100];
     perPagesOptions.push(this.rowsOnPage);
     perPagesOptions.sort(function(a,b){return a-b;});
@@ -48,7 +53,6 @@ Cubique = function(options)
     for (var j in perPagesOptions) {
         this.perPageOptions[perPagesOptions[j]] = perPagesOptions[j];
     }
-
     this.renderGrid();
     this.showData();
 }
@@ -302,19 +306,6 @@ Cubique.prototype.getObjectSize = function Cubique_getObjectSize(obj)
 }
 
 /**
- * Checks if client's browser supports Local Storage.
- * @return bool
- */
-Cubique.prototype.isLocalStorageAvailable = function Cubique_isLocalStorageAvailable()
-{
-    try {
-        return 'localStorage' in window && window['localStorage'] !== null;
-    } catch (e) {
-        return false;
-    }
-}
-
-/**
  * Sets search data and makes AJAX request.
  * @param  value object
  * @param  type object
@@ -419,7 +410,7 @@ Cubique.prototype.stringify = function Cubique_stringify(obj)
 Cubique.prototype.getState = function Cubique_getState(key)
 {
     key = this.name + '_' + key;
-    if (this.isLocalStorageAvailable()) {
+    if (this.isLocalStorageAvailable) {
         return localStorage.getItem(key);
     } else {
         return this.getCookie(key);
@@ -435,7 +426,7 @@ Cubique.prototype.getState = function Cubique_getState(key)
 Cubique.prototype.setState = function Cubique_setState(key, value)
 {
     key = this.name + '_' + key;
-    if (this.isLocalStorageAvailable()) {
+    if (this.isLocalStorageAvailable) {
         localStorage.setItem(key, value);
     } else {
         this.setCookie(key, value);
