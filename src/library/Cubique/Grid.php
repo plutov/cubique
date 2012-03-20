@@ -505,12 +505,7 @@ class Cubique_Grid
             foreach ($result as $key => &$row) {
                 foreach ($columns as $column) {
                     if (array_key_exists($column, $this->_specialData)) {
-                        $newValue = $this->_specialData[$column];
-                        foreach ($columns as $specialColumn) {
-                            $customVar = $this->_specialDataSeparators[0] . $specialColumn . $this->_specialDataSeparators[1];
-                            $newValue = str_replace($customVar, $row[$specialColumn], $newValue);
-                        }
-                        $row[$column] = $newValue;
+                        $row[$column] = str_replace(array_map(array($this, '_getSpecialPart'), $columns), array_values($row), $this->_specialData[$column]);
                     }
                     if (in_array($column, $this->_columnsToEscape)) {
                         $row[$column] = $view->escape($row[$column]);
@@ -598,5 +593,15 @@ class Cubique_Grid
     private function _typeException($type, $variable)
     {
         throw new Cubique_InvalidArgumentException(ucfirst($type) . ' expected for "' . $variable . '".');
+    }
+
+    /**
+     * Returns substring for replacement.
+     * @param  string $column
+     * @return string
+     */
+    private function _getSpecialPart($column)
+    {
+        return $this->_specialDataSeparators[0] . $column . $this->_specialDataSeparators[1];
     }
 }
