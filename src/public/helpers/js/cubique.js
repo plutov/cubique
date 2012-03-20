@@ -326,46 +326,6 @@ Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type)
 }
 
 /**
- * Sets cookie value.
- * @param  name string
- * @param  value string|number
- * @return void
- */
-Cubique.prototype.setCookie = function Cubique_setCookie(name, value)
-{
-    var now    = new Date();
-    var expire = new Date();
-    expire.setTime(now.getTime() + 3600000 * 24 * 10); // Just 10 days
-    document.cookie = name + '=' + value + ';expires=' + expire.toGMTString() + ';path=/';
-}
-
-/**
- * Returns cookie value or empty string.
- * @param  name string
- * @return string
- */
-Cubique.prototype.getCookie = function Cubique_getCookie(name)
-{
-    var cookie = ' ' + document.cookie;
-    var search = ' ' + name + '=';
-    var value = '';
-    var offset = 0;
-    var end = 0;
-    if (cookie.length > 0) {
-        offset = cookie.indexOf(search);
-        if (offset != -1) {
-            offset += search.length;
-            end = cookie.indexOf(';', offset);
-            if (end == -1) {
-                end = cookie.length;
-            }
-            value = cookie.substring(offset, end);
-        }
-    }
-    return(value);
-}
-
-/**
  * Returns JSON string.
  * @param   obj object
  * @return  string
@@ -413,7 +373,23 @@ Cubique.prototype.getState = function Cubique_getState(key)
     if (this.isLocalStorageAvailable) {
         return localStorage.getItem(key);
     } else {
-        return this.getCookie(key);
+        var cookie = ' ' + document.cookie;
+        var search = ' ' + key + '=';
+        var value = '';
+        var offset = 0;
+        var end = 0;
+        if (cookie.length > 0) {
+            offset = cookie.indexOf(search);
+            if (offset != -1) {
+                offset += search.length;
+                end = cookie.indexOf(';', offset);
+                if (end == -1) {
+                    end = cookie.length;
+                }
+                value = cookie.substring(offset, end);
+            }
+        }
+        return(value);
     }
 }
 
@@ -429,6 +405,9 @@ Cubique.prototype.setState = function Cubique_setState(key, value)
     if (this.isLocalStorageAvailable) {
         localStorage.setItem(key, value);
     } else {
-        this.setCookie(key, value);
+        var now    = new Date();
+        var expire = new Date();
+        expire.setTime(now.getTime() + 3600000 * 24 * 10); // Just 10 days
+        document.cookie = key + '=' + value + ';expires=' + expire.toGMTString() + ';path=/';
     }
 }
