@@ -24,16 +24,16 @@ Cubique = function(options)
     } catch (e) {
         this.isLocalStorageAvailable = false;
     }
-    var perPagesOptions = [10, 25, 50, 100];
+    var perPagesOptions = [10, 25, 50, 100],
+        rowsOnPageState = parseInt(this.getState('rowsOnPage')),
+        currPageState   = parseInt(this.getState('currPage')),
+        sortColumnState = this.getState('sortColumn'),
+        sortOrderState  = this.getState('sortOrder'),
+        local           = this,
+        searchState     = $.parseJSON(local.getState('search'));
     perPagesOptions.push(this.rowsOnPage);
     perPagesOptions.sort(function(a,b){return a-b;});
     perPagesOptions.join();
-    var rowsOnPageState = parseInt(this.getState('rowsOnPage'));
-    var currPageState   = parseInt(this.getState('currPage'));
-    var sortColumnState = this.getState('sortColumn');
-    var sortOrderState  = this.getState('sortOrder');
-    var local = this;
-    var searchState     = $.parseJSON(local.getState('search'));
     if (sortColumnState && sortOrderState) {
         this.sort = sortColumnState + ' ' + sortOrderState;
     }
@@ -63,12 +63,12 @@ Cubique = function(options)
  */
 Cubique.prototype.renderGrid = function Cubique_renderGrid()
 {
-    var html   = '<table class="cubique"><thead><tr>';
-    var column = '';
-    var sortColumnState = this.getState('sortColumn');
-    var sortOrderState  = this.getState('sortOrder');
-    var spanValue       = '';
-    var dataOrder       = 'ASC';
+    var html   = '<table class="cubique"><thead><tr>',
+        column = '',
+        sortColumnState = this.getState('sortColumn'),
+        sortOrderState  = this.getState('sortOrder'),
+        spanValue       = '',
+        dataOrder       = 'ASC';
     for (var i in this.columns) {
         if (typeof(this.columnsToSort[i]) != 'undefined') {
             spanValue = (sortColumnState == this.columnsToSort[i]) ? (sortOrderState == 'ASC' ? '&#9660' : '&#9650') : '';
@@ -83,9 +83,8 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     var searchType = '<select class="search-type"></select>';
     if (this.getObjectSize(this.columnsToSearch)) {
         html += '<tr>';
-        var searchValue = '';
-        var tempSearchType = '';
-        var conditions     = ['LIKE', 'NOT LIKE', '=', '<>', '<', '>', '<=', '>='];
+        var searchValue = tempSearchType = '',
+            conditions  = ['LIKE', 'NOT LIKE', '=', '<>', '<', '>', '<=', '>='];
         for (var j in this.columns) {
             column = '';
             if (typeof(this.columnsToSearch[j]) != 'undefined') {
@@ -106,10 +105,10 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     }
     html += '</thead><tbody></tbody></table>';
     $('#cubique-' + this.name).html(html);
-    var sortOrder  = 'ASC';
-    var sortColumn = '';
-    var local      = this;
-    var sortLinks  = $('#cubique-' + this.name + ' a.sort-by');
+    var sortOrder  = 'ASC',
+        sortColumn = '',
+        local      = this,
+        sortLinks  = $('#cubique-' + this.name + ' a.sort-by');
     sortLinks.click(function() {
         sortLinks.prev('span').html('');
         sortOrder      = $(this).attr('data-order');
@@ -133,8 +132,8 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         return false;
     });
     $('#cubique-' + this.name + ' .reset-search').click(function() {
-        var input  = $(this).prev();
-        var select = input.prev();
+        var input  = $(this).prev(),
+            select = input.prev();
         input.val(null);
         select.val('LIKE');
         local.makeSearch(input, select);
@@ -150,12 +149,12 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
  */
 Cubique.prototype.showData = function Cubique_showData()
 {
-    var columnsCount    = this.getObjectSize(this.columns);
-    var loading         = $('<tr><td colspan="' + columnsCount + '" class="loading">.</td></tr>');
-    var loadingInterval = setInterval(function() { $('.loading').html($('.loading').html() + '.'); }, 50);
+    var columnsCount    = this.getObjectSize(this.columns),
+        loading         = $('<tr><td colspan="' + columnsCount + '" class="loading">.</td></tr>'),
+        loadingInterval = setInterval(function() { $('.loading').html($('.loading').html() + '.'); }, 50),
+        local = this,
+        date = new Date();
     this.tbody.html(loading);
-    var local = this;
-    var date = new Date();
     $.ajax({
         type: 'post',
         data: {
@@ -207,11 +206,10 @@ Cubique.prototype.showData = function Cubique_showData()
  */
 Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
 {
-    var pages      = '';
-    var pagesCount = Math.ceil(this.count/this.rowsOnPage);
-    var from       = 1;
-    var to         = pagesCount;
-    var moreSpan   = '<span class="more">...</span>';
+    var pages      = '',
+        pagesCount = to = Math.ceil(this.count/this.rowsOnPage),
+        from       = 1,
+        moreSpan   = '<span class="more">...</span>';
     if (pagesCount > 10) {
         if (this.currPage <= 6) {
             from = 1;
@@ -229,8 +227,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
             }
         }
     }
-    var i = null;
-    for (i = from; i <= to; i++) {
+    for (var i = from; i <= to; i++) {
         pages += this.getGoToPageLink(i, i == this.currPage);
     }
     if (pagesCount > to) {
@@ -240,8 +237,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         pages += this.getGoToPageLink(pagesCount, false);
     }
     var select = '<select class="per-page">';
-    var j = null;
-    for (j in this.perPageOptions) {
+    for (var j in this.perPageOptions) {
         select += '<option value="' + this.perPageOptions[j] + '">' + this.perPageOptions[j] + '</option>';
     }
     select += '</select>';
@@ -313,8 +309,8 @@ Cubique.prototype.getObjectSize = function Cubique_getObjectSize(obj)
  */
 Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type)
 {
-    var searchColumn = value.attr('data-column');
-    var search       = [value.val(), type.val()];
+    var searchColumn = value.attr('data-column'),
+        search       = [value.val(), type.val()];
     if (this.searchValues[searchColumn] != search) {
         this.search[searchColumn] = search;
         this.setState('currPage', 1);
@@ -373,11 +369,10 @@ Cubique.prototype.getState = function Cubique_getState(key)
     if (this.isLocalStorageAvailable) {
         return localStorage.getItem(key);
     } else {
-        var cookie = ' ' + document.cookie;
-        var search = ' ' + key + '=';
-        var value = '';
-        var offset = 0;
-        var end = 0;
+        var cookie = ' ' + document.cookie,
+            search = ' ' + key + '=',
+            value = '',
+            offset = end = 0;
         if (cookie.length > 0) {
             offset = cookie.indexOf(search);
             if (offset != -1) {
@@ -405,9 +400,8 @@ Cubique.prototype.setState = function Cubique_setState(key, value)
     if (this.isLocalStorageAvailable) {
         localStorage.setItem(key, value);
     } else {
-        var now    = new Date();
-        var expire = new Date();
-        expire.setTime(now.getTime() + 3600000 * 24 * 10); // Just 10 days
+        var now = expire = new Date();
+        expire.setTime(now.getTime() + 864000000); // Just 10 days
         document.cookie = key + '=' + value + ';expires=' + expire.toGMTString() + ';path=/';
     }
 }
