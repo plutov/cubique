@@ -73,7 +73,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         if (typeof(this.columnsToSort[i]) != 'undefined') {
             spanValue = (sortColumnState == this.columnsToSort[i]) ? (sortOrderState == 'ASC' ? '&#9660' : '&#9650') : '';
             dataOrder = (sortColumnState == this.columnsToSort[i]) ? (sortOrderState == 'ASC' ? 'DESC' : 'ASC') : 'ASC';
-            column = '<span class="order">' + spanValue + '</span> <a href="#" class="sort-by" data-column="' + i + '" data-order="' + dataOrder + '">' + this.columns[i] + '</a>';
+            column = '<span class="order">' + spanValue + '</span> <a href="#" title="Sort by ' + this.columns[i] + '" class="sort-by" data-column="' + i + '" data-order="' + dataOrder + '">' + this.columns[i] + '</a>';
         } else {
             column = this.columns[i];
         }
@@ -90,13 +90,13 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
             if (typeof(this.columnsToSearch[j]) != 'undefined') {
                 searchValue = (typeof(this.search[j]) != 'undefined') ? this.search[j][0] : '';
                 tempSearchType = (typeof(this.search[j]) != 'undefined') ? this.search[j][1] : '';
-                column += '<select class="search-type">';
+                column += '<select class="search-type" title="Search type">';
                 for (var k in conditions) {
                     column += '<option value="' + conditions[k] + '"' + (tempSearchType == '' + conditions[k] + '' ? ' selected=selected' : '') + '>' + conditions[k] + '</option>';
                 }
                 column += '</select>' +
                           '<input type="text" data-column="' + j + '" placeholder="search" value="' + searchValue + '"/> ' +
-                          '<a href="#" class="reset-search">&times;</a>';
+                          '<a href="#" class="reset-search" title="Reset search">&times;</a>';
                 this.searchValues[j] = (typeof(this.search[j]) != 'undefined') ? this.search[j] : '';
             }
             html += '<th>' + column + '</th>';
@@ -236,14 +236,14 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         }
         pages += this.getGoToPageLink(pagesCount, false);
     }
-    var select = '<select class="per-page">';
+    var select = '<select class="per-page" title="Rows on page">';
     for (var j in this.perPageOptions) {
         select += '<option value="' + this.perPageOptions[j] + '">' + this.perPageOptions[j] + '</option>';
     }
     select += '</select>';
     this.thead.append($('<tr class="pages"><th colspan="' + this.getObjectSize(this.columns) + '">' + pages +
-                        '<a href="#" class="csv">csv</a>' +
-                        '<a href="#" class="refresh">refresh</a>' + select + '<span class="in-total">' +
+                        '<a href="#" class="csv" title="Export to CSV">csv</a>' +
+                        '<a href="#" class="refresh" title="Refresh page">refresh</a>' + select + '<span class="in-total">' +
                         this.count + ' in total</span></th></tr>'));
     var local = this;
     this.thead.find('.go-to-page').click(function() {
@@ -282,7 +282,7 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
 
 Cubique.prototype.getGoToPageLink = function Cubique_getGoToPageLink(pageNumber, isCurrent)
 {
-    return '<a href="#" class="go-to-page' + (isCurrent ? ' curr' : '') + '" data-number="' + pageNumber + '">' + pageNumber + '</a>'
+    return '<a href="#" title="Go to page ' + pageNumber + '" class="go-to-page' + (isCurrent ? ' curr' : '') + '" data-number="' + pageNumber + '">' + pageNumber + '</a>'
 }
 
 /**
