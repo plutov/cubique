@@ -25,3 +25,8 @@ Tested in:
    * Safari 5+
    * Opera 10+
    * IE 6+
+   
+Who uses Cubique:
+
+   * [convert.by](http://convert.by) (Control panel)
+   * [plutov.by](http://plutov.by) (Control panel)
