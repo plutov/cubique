@@ -29,8 +29,8 @@ Cubique = function(options)
         currPageState   = parseInt(this.getState('currPage')),
         sortColumnState = this.getState('sortColumn'),
         sortOrderState  = this.getState('sortOrder'),
-        local           = this,
-        searchState     = $.parseJSON(local.getState('search'));
+        l               = this,
+        searchState     = $.parseJSON(l.getState('search'));
     perPagesOptions.push(this.rowsOnPage);
     perPagesOptions.sort(function(a,b){return a-b;});
     perPagesOptions.join();
@@ -80,7 +80,6 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
         html += '<th>' + column + '</th>';
     }
     html += '</tr>';
-    var searchType = '<select class="search-type"></select>';
     if (this.getObjectSize(this.columnsToSearch)) {
         html += '<tr>';
         var searchValue = tempSearchType = '',
@@ -107,28 +106,28 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
     $('#cubique-' + this.name).html(html);
     var sortOrder  = 'ASC',
         sortColumn = '',
-        local      = this,
+        l          = this,
         sortLinks  = $('#cubique-' + this.name + ' a.sort-by');
     sortLinks.click(function() {
         sortLinks.prev('span').html('');
         sortOrder      = $(this).attr('data-order');
         sortColumn     = $(this).attr('data-column');
-        local.currPage = 1;
-        local.sort     = sortColumn + ' ' + sortOrder;
-        local.setState('currPage', 1);
-        local.setState('sortColumn', sortColumn);
-        local.setState('sortOrder', sortOrder);
+        l.currPage = 1;
+        l.sort     = sortColumn + ' ' + sortOrder;
+        l.setState('currPage', 1);
+        l.setState('sortColumn', sortColumn);
+        l.setState('sortOrder', sortOrder);
         $(this).attr('data-order', sortOrder == 'ASC' ? 'DESC' : 'ASC');
         $(this).prev('span').html(sortOrder == 'ASC' ? '&#9660;' : '&#9650;');
-        local.showData();
+        l.showData();
         return false;
     });
     $('#cubique-' + this.name + ' input').keyup(function() {
-        local.makeSearch($(this), $(this).prev('select'));
+        l.makeSearch($(this), $(this).prev('select'));
         return false;
     });
     $('#cubique-' + this.name + ' .search-type').change(function() {
-        local.makeSearch($(this).next('input'), $(this));
+        l.makeSearch($(this).next('input'), $(this));
         return false;
     });
     $('#cubique-' + this.name + ' .reset-search').click(function() {
@@ -136,7 +135,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
             select = input.prev();
         input.val(null);
         select.val('LIKE');
-        local.makeSearch(input, select);
+        l.makeSearch(input, select);
         return false;
     });
     this.tbody = $('#cubique-' + this.name + ' tbody');
@@ -152,27 +151,27 @@ Cubique.prototype.showData = function Cubique_showData()
     var columnsCount    = this.getObjectSize(this.columns),
         loading         = $('<tr><td colspan="' + columnsCount + '" class="loading">.</td></tr>'),
         loadingInterval = setInterval(function() { $('.loading').html($('.loading').html() + '.'); }, 50),
-        local = this,
+        l    = this,
         date = new Date();
     this.tbody.html(loading);
     $.ajax({
         type: 'post',
         data: {
             cubique: {
-                name:         local.name,
-                curr_page:    local.currPage,
-                sort:         local.sort,
-                search:       local.search,
-                rows_on_page: local.rowsOnPage
+                name:         l.name,
+                curr_page:    l.currPage,
+                sort:         l.sort,
+                search:       l.search,
+                rows_on_page: l.rowsOnPage
             }
         },
-        url: (local.url ? local.url : location.href) + '?nocache=' + date.getTime(),
+        url: (l.url ? l.url : location.href) + '?nocache=' + date.getTime(),
         dataType: 'json',
         success:  function(response) {
             if (response.error) {
-                local.tbody.html('<tr><td colspan="' + columnsCount + '" class="error">' + local.error_message + '</td></tr>');
+                l.tbody.html('<tr><td colspan="' + columnsCount + '" class="error">' + l.error_message + '</td></tr>');
             } else {
-                local.count = response.count;
+                l.count = response.count;
                 var html = '';
                 for (var rowKey in response.data) {
                     html += '<tr>';
@@ -184,15 +183,15 @@ Cubique.prototype.showData = function Cubique_showData()
                     }
                     html += '</tr>';
                 }
-                local.tbody.html(html);
+                l.tbody.html(html);
                 $('table.cubique tbody td').mouseover(function() {
                     $(this).parent().addClass('hovered');
                 })
                 .mouseleave(function() {
                     $(this).parent().removeClass('hovered');
                 });
-                local.thead.find('.pages').remove();
-                local.renderPagesSection();
+                l.thead.find('.pages').remove();
+                l.renderPagesSection();
             }
             clearInterval(loadingInterval);
             loading.remove();
@@ -245,37 +244,37 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
                         '<a href="#" class="csv" title="Export to CSV">csv</a>' +
                         '<a href="#" class="refresh" title="Refresh page">refresh</a>' + select + '<span class="in-total">' +
                         this.count + ' in total</span></th></tr>'));
-    var local = this;
+    var l = this;
     this.thead.find('.go-to-page').click(function() {
-        local.currPage = parseInt($(this).attr('data-number'));
-        local.setState('currPage', local.currPage);
-        local.showData();
+        l.currPage = parseInt($(this).attr('data-number'));
+        l.setState('currPage', l.currPage);
+        l.showData();
         return false;
     });
     this.thead.find('.per-page').change(function() {
-        local.rowsOnPage = $(this).val();
-        local.setState('rowsOnPage', local.rowsOnPage);
-        local.setState('currPage', 1);
-        local.currPage   = 1;
-        local.showData();
+        l.rowsOnPage = $(this).val();
+        l.setState('rowsOnPage', l.rowsOnPage);
+        l.setState('currPage', 1);
+        l.currPage   = 1;
+        l.showData();
         return false;
     }).val(this.rowsOnPage);
     this.thead.find('.refresh').click(function() {
-        local.showData();
+        l.showData();
         return false;
     });
     this.thead.find('.csv').click(function() {
         data = {
             cubique: {
-                name:         local.name,
-                curr_page:    local.currPage,
-                sort:         local.sort,
-                search:       local.search,
-                rows_on_page: local.rowsOnPage
+                name:         l.name,
+                curr_page:    l.currPage,
+                sort:         l.sort,
+                search:       l.search,
+                rows_on_page: l.rowsOnPage
             }
         };
-        data = local.stringify(data);
-        document.location.href = (local.url ? local.url : location.href) + '?cubique_data=' + encodeURIComponent(data);
+        data = l.stringify(data);
+        document.location.href = (l.url ? l.url : location.href) + '?cubique_data=' + encodeURIComponent(data);
         return false;
     });
 }
