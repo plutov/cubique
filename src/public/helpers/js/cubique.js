@@ -7,8 +7,8 @@
  */
 
 /**
- * Set common variables, render grid, get data.
- * @param  options object
+ * Sets common variables, render grid, get data.
+ * @param options object
  * @return void
  */
 Cubique = function(options)
@@ -58,7 +58,7 @@ Cubique = function(options)
 }
 
 /**
- * Render main grid HTML.
+ * Renders main grid HTML.
  * @return void
  */
 Cubique.prototype.renderGrid = function Cubique_renderGrid()
@@ -143,7 +143,7 @@ Cubique.prototype.renderGrid = function Cubique_renderGrid()
 }
 
 /**
- * Make AJAX request to the server and display data.
+ * Makes AJAX request to the server and display data.
  * @return void
  */
 Cubique.prototype.showData = function Cubique_showData()
@@ -156,15 +156,7 @@ Cubique.prototype.showData = function Cubique_showData()
     this.tbody.html(loading);
     $.ajax({
         type: 'post',
-        data: {
-            cubique: {
-                name:         l.name,
-                curr_page:    l.currPage,
-                sort:         l.sort,
-                search:       l.search,
-                rows_on_page: l.rowsOnPage
-            }
-        },
+        data: l.getPostData(),
         url: (l.url ? l.url : location.href) + '?nocache=' + date.getTime(),
         dataType: 'json',
         success:  function(response) {
@@ -200,7 +192,7 @@ Cubique.prototype.showData = function Cubique_showData()
 }
 
 /**
- * Render pages section.
+ * Renders pages section.
  * @return void
  */
 Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
@@ -264,21 +256,18 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
         return false;
     });
     this.thead.find('.csv').click(function() {
-        data = {
-            cubique: {
-                name:         l.name,
-                curr_page:    l.currPage,
-                sort:         l.sort,
-                search:       l.search,
-                rows_on_page: l.rowsOnPage
-            }
-        };
-        data = l.stringify(data);
+        var data = l.stringify(l.getPostData());
         document.location.href = (l.url ? l.url : location.href) + '?cubique_data=' + encodeURIComponent(data);
         return false;
     });
 }
 
+/**
+ * Returns go-to-page link.
+ * @param pageNumber number
+ * @param isCurrent bool
+ * @return string
+ */
 Cubique.prototype.getGoToPageLink = function Cubique_getGoToPageLink(pageNumber, isCurrent)
 {
     return '<a href="#" title="Go to page ' + pageNumber + '" class="go-to-page' + (isCurrent ? ' curr' : '') + '" data-number="' + pageNumber + '">' + pageNumber + '</a>'
@@ -286,7 +275,7 @@ Cubique.prototype.getGoToPageLink = function Cubique_getGoToPageLink(pageNumber,
 
 /**
  * Get object size.
- * @param  obj object
+ * @param obj object
  * @return int
  */
 Cubique.prototype.getObjectSize = function Cubique_getObjectSize(obj)
@@ -302,8 +291,8 @@ Cubique.prototype.getObjectSize = function Cubique_getObjectSize(obj)
 
 /**
  * Sets search data and makes AJAX request.
- * @param  value object
- * @param  type object
+ * @param value object
+ * @param type object
  * @return void
  */
 Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type)
@@ -322,8 +311,8 @@ Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type)
 
 /**
  * Returns JSON string.
- * @param   obj object
- * @return  string
+ * @param obj object
+ * @return string
  */
 Cubique.prototype.stringify = function Cubique_stringify(obj)
 {
@@ -359,7 +348,7 @@ Cubique.prototype.stringify = function Cubique_stringify(obj)
 
 /**
  * Returns key value from local storage or cookies.
- * @param  key string
+ * @param key string
  * @return string
  */
 Cubique.prototype.getState = function Cubique_getState(key)
@@ -389,8 +378,8 @@ Cubique.prototype.getState = function Cubique_getState(key)
 
 /**
  * Sets value of state in local storage or cookies.
- * @param  key string
- * @param  value string
+ * @param key string
+ * @param value string
  * @return void
  */
 Cubique.prototype.setState = function Cubique_setState(key, value)
@@ -403,4 +392,21 @@ Cubique.prototype.setState = function Cubique_setState(key, value)
         expire.setTime(now.getTime() + 864000000); // Just 10 days
         document.cookie = key + '=' + value + ';expires=' + expire.toGMTString() + ';path=/';
     }
+}
+
+/**
+ * Returns data for AJAX or CSV export.
+ * @return obj
+ */
+Cubique.prototype.getPostData = function Cubique_getPostData()
+{
+    return {
+        cubique: {
+            name:         this.name,
+            curr_page:    this.currPage,
+            sort:         this.sort,
+            search:       this.search,
+            rows_on_page: this.rowsOnPage
+        }
+    };
 }
