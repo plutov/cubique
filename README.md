@@ -17,6 +17,7 @@ Features:
    * Export current page to CSV
    * JOINs are available
    * Easy DB data changing
+   * Works with Zend Framework 2
 
 Tested in:
 
