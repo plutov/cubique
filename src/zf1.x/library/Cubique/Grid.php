@@ -564,15 +564,15 @@ class Cubique_Grid
         } elseif ($request->getParam('cubique_data')) {
             $data = $this->_getData(Zend_Json_Decoder::decode(urldecode($request->getParam('cubique_data'))));
             if (!$data['error']) {
-                Zend_Layout::getMvcInstance()->disableLayout();
-                Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->setNoRender(true);
-                header('Content-Description: File Transfer');
-                header('Content-Type: text/csv; charset=utf-8');
-                header('Content-Disposition: attachment; filename=' . $this->_name . '_' . uniqid() . '.csv');
-                header('Content-Transfer-Encoding: binary');
-                header('Expires: 0');
-                header('Cache-control: private, must-revalidate');
-                header("Pragma: public");
+                Zend_Controller_Front::getInstance()->getResponse()
+                    ->setHeader('Content-Description', 'File Transfer')
+                    ->setHeader('Content-Disposition', 'attachment; filename=' . $this->_name . '_' . uniqid() . '.csv')
+                    ->setHeader('Content-Type', 'text/csv; charset=utf-8')
+                    ->setHeader('Content-Transfer-Encoding', 'binary')
+                    ->setHeader('Expires', '0')
+                    ->setHeader('Cache-control', 'private, must-revalidate')
+                    ->setHeader('Pragma', 'public')
+                    ->sendHeaders();
                 $csv = implode($this->_csvDelimiters['field'], $this->_columns);
                 foreach ($data['data'] as $item) {
                     $csv .= $this->_csvDelimiters['line'] . implode($this->_csvDelimiters['field'], $item);

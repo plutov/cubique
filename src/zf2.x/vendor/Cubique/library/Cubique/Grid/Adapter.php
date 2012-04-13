@@ -567,13 +567,18 @@ class Adapter
         } elseif ($request->query()->get('cubique_data')) {
             $data = $this->_getData(\Zend\Json\Decoder::decode(urldecode($request->query()->get('cubique_data'))));
             if (!$data['error']) {
-                header('Content-Description: File Transfer');
-                header('Content-Type: text/csv; charset=utf-8');
-                header('Content-Disposition: attachment; filename=' . $this->_name . '_' . uniqid() . '.csv');
-                header('Content-Transfer-Encoding: binary');
-                header('Expires: 0');
-                header('Cache-control: private, must-revalidate');
-                header("Pragma: public");
+                $response = new \Zend\Http\PhpEnvironment\Response();
+                $headers  = new \Zend\Http\Headers();
+                $headers
+                    ->addHeaderLine('Content-Description', 'File Transfer')
+                    ->addHeaderLine('Content-Disposition', 'attachment; filename=' . $this->_name . '_' . uniqid() . '.csv')
+                    ->addHeaderLine('Content-Type', 'text/csv; charset=utf-8')
+                    ->addHeaderLine('Content-Transfer-Encoding', 'binary')
+                    ->addHeaderLine('Expires', '0')
+                    ->addHeaderLine('Cache-control', 'private, must-revalidate')
+                    ->addHeaderLine('Pragma', 'public');
+                $response->setHeaders($headers);
+                $response->send();
                 $csv = implode($this->_csvDelimiters['field'], $this->_columns);
                 foreach ($data['data'] as $item) {
                     $csv .= $this->_csvDelimiters['line'] . implode($this->_csvDelimiters['field'], $item);
