@@ -426,10 +426,10 @@ class Cubique_Grid
                 throw new Cubique_Exception('Invalid post data');
             }
             $cubique    = $post['cubique'];
-            $currPage   = isset($cubique['curr_page']) ? intval($cubique['curr_page']) : 1;
-            $sort       = isset($cubique['sort']) ? $cubique['sort'] : '';
-            $search     = isset($cubique['search']) ? $cubique['search'] : array();
-            $rowsOnPage = isset($cubique['rows_on_page']) ? intval($cubique['rows_on_page']) : $this->_rowsOnPage;
+            $currPage   = isset($cubique['cp']) ? intval($cubique['cp']) : 1;
+            $sort       = isset($cubique['so']) ? $cubique['so'] : '';
+            $search     = isset($cubique['sr']) ? $cubique['sr'] : array();
+            $rowsOnPage = isset($cubique['rop']) ? intval($cubique['rop']) : $this->_rowsOnPage;
             if (!$this->_table) {
                 throw new Cubique_Exception('"$this->_table" can not be empty.');
             }
@@ -535,13 +535,13 @@ class Cubique_Grid
     public function __toString()
     {
         $optionsJson = Zend_Json_Encoder::encode(array(
-            'name'            => $this->_name,
-            'columns'         => $this->_columns,
-            'rowsOnPage'      => $this->_rowsOnPage,
-            'columnsToSort'   => $this->_columnsToSort,
-            'columnsToSearch' => $this->_columnsToSearch,
-            'url'             => $this->_url,
-            'error_message'   => $this->_errorMessage
+            'n'    => $this->_name,
+            'co'   => $this->_columns,
+            'rop'  => $this->_rowsOnPage,
+            'coso' => $this->_columnsToSort,
+            'cosr' => $this->_columnsToSearch,
+            'url'  => $this->_url,
+            'em'   => $this->_errorMessage
         ));
         return '<div id="cubique-' . $this->_name . '"></div>' . PHP_EOL .
                '<script type="text/javascript">' . PHP_EOL .

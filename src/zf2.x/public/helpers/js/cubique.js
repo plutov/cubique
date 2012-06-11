@@ -8,174 +8,167 @@
 
 /**
  * Sets common variables, render grid, get data.
- * @param options object
+ * @param o object Grid options from server
  * @return void
  */
-Cubique = function(options)
+Cubique = function(o)
 {
-    $.extend(this, options);
-    this.count        = 0;
-    this.currPage     = 1;
-    this.sort         = '';
-    this.search       = {};
-    this.searchValues = {};
+    var l = this;
+    $.extend(l, o);
+    l.c  = 0; // total count
+    l.cp = 1; // current page
+    l.sv = {}; // temp stored search values
+    // islsa - is local storage available
     try {
-        this.isLocalStorageAvailable = 'localStorage' in window && window['localStorage'] !== null;
+        l.islsa = 'localStorage' in window && window['localStorage'] !== null;
     } catch (e) {
-        this.isLocalStorageAvailable = false;
+        l.islsa = false;
     }
-    var perPagesOptions = [10, 25, 50, 100],
-        rowsOnPageState = parseInt(this.getState('rowsOnPage')),
-        currPageState   = parseInt(this.getState('currPage')),
-        sortColumnState = this.getState('sortColumn'),
-        sortOrderState  = this.getState('sortOrder'),
-        l               = this,
-        searchState     = $.parseJSON(l.getState('search'));
-    perPagesOptions.push(this.rowsOnPage);
-    perPagesOptions.sort(function(a,b){return a-b;});
-    perPagesOptions.join();
-    if (sortColumnState && sortOrderState) {
-        this.sort = sortColumnState + ' ' + sortOrderState;
-    }
-    if (rowsOnPageState && $.inArray(rowsOnPageState, perPagesOptions) != -1) {
-        this.rowsOnPage = rowsOnPageState;
-        if (currPageState) {
-            this.currPage = currPageState;
+    var ppo  = [10, 25, 50, 100], // per page options
+        rops = parseInt(l.gs('rop')), // rows on page state
+        cps  = parseInt(l.gs('cp')), // current page state
+        scs  = l.gs('sc'), // sort column state
+        sos  = l.gs('so'), // sort order state
+        srs  = $.parseJSON(l.gs('sr')); // search state
+    ppo.push(l.rop);
+    ppo.sort(function(a,b){return a-b;});
+    ppo.join();
+    l.s = (scs && sos) ? (scs + ' ' + sos) : '';
+    if (rops && $.inArray(rops, ppo) != -1) {
+        l.rop = rops;
+        if (cps) {
+            l.cp = cps;
         }
     } else {
-        this.setState('rowsOnPage', this.rowsOnPage);
-        this.setState('currPage', this.currPage);
+        l.ss('rop', l.rop);
+        l.ss('cp', l.cp);
     }
-    if (searchState) {
-        this.search = searchState;
+    l.sr = srs ? srs : {};
+    l.ppo  = {};
+    for (var j in ppo) {
+        l.ppo[ppo[j]] = ppo[j];
     }
-    this.perPageOptions  = {};
-    for (var j in perPagesOptions) {
-        this.perPageOptions[perPagesOptions[j]] = perPagesOptions[j];
-    }
-    this.renderGrid();
-    this.showData();
+    l.r();
+    l.sd();
 }
 
 /**
  * Renders main grid HTML.
  * @return void
  */
-Cubique.prototype.renderGrid = function Cubique_renderGrid()
+Cubique.prototype.r = function Cubique_r()
 {
-    var html   = '<table class="cubique"><thead><tr>',
-        column = '',
-        sortColumnState = this.getState('sortColumn'),
-        sortOrderState  = this.getState('sortOrder'),
-        spanValue       = '',
-        dataOrder       = 'ASC';
-    for (var i in this.columns) {
-        if (typeof(this.columnsToSort[i]) != 'undefined') {
-            spanValue = (sortColumnState == this.columnsToSort[i]) ? (sortOrderState == 'ASC' ? '&#9660' : '&#9650') : '';
-            dataOrder = (sortColumnState == this.columnsToSort[i]) ? (sortOrderState == 'ASC' ? 'DESC' : 'ASC') : 'ASC';
-            column = '<span class="order">' + spanValue + '</span> <a href="#" title="Sort by ' + this.columns[i] + '" class="sort-by" data-column="' + i + '" data-order="' + dataOrder + '">' + this.columns[i] + '</a>';
+    var h   = '<table class="cubique"><thead><tr>',
+        l   = this,
+        ct  = '', // columns temp
+        scs = l.gs('sc'),
+        sos = l.gs('so');
+    for (var i in l.co) {
+        if (typeof(l.coso[i]) != 'undefined') {
+            ct = '<span class="order">' + ((scs == l.coso[i]) ? (sos == 'ASC' ? '&#9660' : '&#9650') : '') +
+                 '</span> <a href="#" title="Sort by ' + l.co[i] + '" class="sort-by" data-column="' + i + '" data-order="' +
+                 ((scs == l.coso[i]) ? (sos == 'ASC' ? 'DESC' : 'ASC') : 'ASC') + '">' + l.co[i] + '</a>';
         } else {
-            column = this.columns[i];
+            ct = l.co[i];
         }
-        html += '<th>' + column + '</th>';
+        h += '<th>' + ct + '</th>';
     }
-    html += '</tr>';
-    if (this.getObjectSize(this.columnsToSearch)) {
-        html += '<tr>';
-        var searchValue = tempSearchType = '',
-            conditions  = ['LIKE', 'NOT LIKE', '=', '<>', '<', '>', '<=', '>='];
-        for (var j in this.columns) {
-            column = '';
-            if (typeof(this.columnsToSearch[j]) != 'undefined') {
-                searchValue = (typeof(this.search[j]) != 'undefined') ? this.search[j][0] : '';
-                tempSearchType = (typeof(this.search[j]) != 'undefined') ? this.search[j][1] : '';
-                column += '<select class="search-type" title="Search type">';
-                for (var k in conditions) {
-                    column += '<option value="' + conditions[k] + '"' + (tempSearchType == '' + conditions[k] + '' ? ' selected=selected' : '') + '>' + conditions[k] + '</option>';
+    h += '</tr>';
+    if (l.gos(l.cosr)) {
+        h += '<tr>';
+        var tst = '', // temp search type
+            cnd  = ['LIKE', 'NOT LIKE', '=', '<>', '<', '>', '<=', '>='];
+        for (var j in this.co) {
+            ct = '';
+            if (typeof(l.cosr[j]) != 'undefined') {
+                tst = (typeof(l.sr[j]) != 'undefined') ? l.sr[j][1] : '';
+                ct += '<select class="search-type" title="Search type">';
+                for (var k in cnd) {
+                    ct += '<option value="' + cnd[k] + '"' + (tst == '' + cnd[k] + '' ? ' selected=selected' : '') + '>' + cnd[k] + '</option>';
                 }
-                column += '</select>' +
-                          '<input type="text" data-column="' + j + '" placeholder="search" value="' + searchValue + '"/> ' +
-                          '<a href="#" class="reset-search" title="Reset search">&times;</a>';
-                this.searchValues[j] = (typeof(this.search[j]) != 'undefined') ? this.search[j] : '';
+                ct += '</select>' +
+                      '<input type="text" data-column="' + j + '" placeholder="search" value="' +
+                      ((typeof(l.sr[j]) != 'undefined') ? l.sr[j][0] : '') + '"/> ' +
+                      '<a href="#" class="reset-search" title="Reset search">&times;</a>';
+                l.sv[j] = (typeof(l.sr[j]) != 'undefined') ? l.sr[j] : '';
             }
-            html += '<th>' + column + '</th>';
+            h += '<th>' + ct + '</th>';
         }
-        html += '</tr>';
+        h += '</tr>';
     }
-    html += '</thead><tbody></tbody></table>';
-    $('#cubique-' + this.name).html(html);
-    var sortOrder  = 'ASC',
-        sortColumn = '',
-        l          = this,
-        sortLinks  = $('#cubique-' + this.name + ' a.sort-by');
-    sortLinks.click(function() {
-        sortLinks.prev('span').html('');
-        sortOrder      = $(this).attr('data-order');
-        sortColumn     = $(this).attr('data-column');
-        l.currPage = 1;
-        l.sort     = sortColumn + ' ' + sortOrder;
-        l.setState('currPage', 1);
-        l.setState('sortColumn', sortColumn);
-        l.setState('sortOrder', sortOrder);
-        $(this).attr('data-order', sortOrder == 'ASC' ? 'DESC' : 'ASC');
-        $(this).prev('span').html(sortOrder == 'ASC' ? '&#9660;' : '&#9650;');
-        l.showData();
+    h += '</thead><tbody></tbody></table>';
+    $('#cubique-' + l.n).html(h);
+    var so = 'ASC',
+        sc = '',
+        sl = $('#cubique-' + l.n + ' a.sort-by');
+    sl.click(function() {
+        sl.prev('span').html('');
+        so = $(this).attr('data-order');
+        sc = $(this).attr('data-column');
+        l.cp = 1;
+        l.s  = sc + ' ' + so;
+        l.ss('cp', 1);
+        l.ss('sc', sc);
+        l.ss('so', so);
+        $(this).attr('data-order', so == 'ASC' ? 'DESC' : 'ASC');
+        $(this).prev('span').html(so == 'ASC' ? '&#9660;' : '&#9650;');
+        l.sd();
         return false;
     });
-    $('#cubique-' + this.name + ' input').keyup(function() {
+    $('#cubique-' + l.n + ' input').keyup(function() {
         l.makeSearch($(this), $(this).prev('select'));
         return false;
     });
-    $('#cubique-' + this.name + ' .search-type').change(function() {
+    $('#cubique-' + l.n + ' .search-type').change(function() {
         l.makeSearch($(this).next('input'), $(this));
         return false;
     });
-    $('#cubique-' + this.name + ' .reset-search').click(function() {
-        var input  = $(this).prev(),
-            select = input.prev();
-        input.val(null);
-        select.val('LIKE');
-        l.makeSearch(input, select);
+    $('#cubique-' + l.n + ' .reset-search').click(function() {
+        var i  = $(this).prev(),
+            sl = i.prev();
+        i.val(null);
+        sl.val('LIKE');
+        l.makeSearch(i, sl);
         return false;
     });
-    this.tbody = $('#cubique-' + this.name + ' tbody');
-    this.thead = $('#cubique-' + this.name + ' thead');
+    l.tbody = $('#cubique-' + l.n + ' tbody');
+    l.thead = $('#cubique-' + l.n + ' thead');
 }
 
 /**
  * Makes AJAX request to the server and display data.
  * @return void
  */
-Cubique.prototype.showData = function Cubique_showData()
+Cubique.prototype.sd = function Cubique_sd()
 {
-    var columnsCount    = this.getObjectSize(this.columns),
-        loading         = $('<tr><td colspan="' + columnsCount + '" class="loading">.</td></tr>'),
-        loadingInterval = setInterval(function() { $('.loading').html($('.loading').html() + '.'); }, 50),
-        l    = this,
-        date = new Date();
-    this.tbody.html(loading);
+    var l   = this,
+        cc  = l.gos(l.co),
+        ldn = $('<tr><td colspan="' + cc + '" class="loading">.</td></tr>'),
+        li  = setInterval(function() { $('.loading').html($('.loading').html() + '.'); }, 50),
+        d   = new Date();
+    this.tbody.html(ldn);
     $.ajax({
         type: 'post',
-        data: l.getPostData(),
-        url: (l.url ? l.url : location.href) + '?nocache=' + date.getTime(),
+        data: l.gpd(),
+        url: (l.url ? l.url : location.href) + '?nocache=' + d.getTime(),
         dataType: 'json',
-        success:  function(response) {
-            if (response.error) {
-                l.tbody.html('<tr><td colspan="' + columnsCount + '" class="error">' + l.error_message + '</td></tr>');
+        success:  function(r) {
+            if (r.error) {
+                l.tbody.html('<tr><td colspan="' + cc + '" class="error">' + l.em + '</td></tr>');
             } else {
-                l.count = response.count;
-                var html = '';
-                for (var rowKey in response.data) {
-                    html += '<tr>';
-                    for (var columnName in response.data[rowKey]) {
-                        if (null == response.data[rowKey][columnName]) {
-                            response.data[rowKey][columnName] = '';
+                l.c = r.count;
+                var h = '';
+                for (var i in r.data) {
+                    h += '<tr>';
+                    for (var j in r.data[i]) {
+                        if (null == r.data[i][j]) {
+                            r.data[i][j] = '';
                         }
-                        html += '<td>' + response.data[rowKey][columnName] + '</td>';
+                        h += '<td>' + r.data[i][j] + '</td>';
                     }
-                    html += '</tr>';
+                    h += '</tr>';
                 }
-                l.tbody.html(html);
+                l.tbody.html(h);
                 $('table.cubique tbody td').mouseover(function() {
                     $(this).parent().addClass('hovered');
                 })
@@ -183,10 +176,10 @@ Cubique.prototype.showData = function Cubique_showData()
                     $(this).parent().removeClass('hovered');
                 });
                 l.thead.find('.pages').remove();
-                l.renderPagesSection();
+                l.rps();
             }
-            clearInterval(loadingInterval);
-            loading.remove();
+            clearInterval(li);
+            ldn.remove();
         }
     });
 }
@@ -195,68 +188,69 @@ Cubique.prototype.showData = function Cubique_showData()
  * Renders pages section.
  * @return void
  */
-Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
+Cubique.prototype.rps = function Cubique_rps()
 {
-    var pages      = '',
-        pagesCount = to = Math.ceil(this.count/this.rowsOnPage),
-        from       = 1,
-        moreSpan   = '<span class="more">...</span>';
-    if (pagesCount > 10) {
-        if (this.currPage <= 6) {
+    var ph   = '',
+        pc   = Math.ceil(this.c/this.rop),
+        to   = pc,
+        from = 1,
+        l    = this,
+        ms   = '<span class="more">...</span>';
+    if (pc > 10) {
+        if (l.cp <= 6) {
             from = 1;
             to   = 10;
-        } else if (pagesCount - this.currPage <= 5) {
-            from = pagesCount - 11;
-            to   = pagesCount;
-            pages += this.getGoToPageLink(1, false) + moreSpan;
+        } else if (pc - l.cp <= 5) {
+            from = pc - 11;
+            to   = pc;
+            ph += l.gtp(1, false) + ms;
         } else {
-            from = this.currPage - 5;
-            to   = (this.currPage + 5 <= pagesCount) ? this.currPage + 5 : pagesCount;
-            pages += this.getGoToPageLink(1, false);
-            if (this.currPage > 7) {
-                pages += moreSpan;
+            from = l.cp - 5;
+            to   = (l.cp + 5 <= pc) ? l.cp + 5 : pc;
+            ph   += l.gtp(1, false);
+            if (l.cp > 7) {
+                ph += ms;
             }
         }
     }
     for (var i = from; i <= to; i++) {
-        pages += this.getGoToPageLink(i, i == this.currPage);
+        ph += l.gtp(i, i == l.cp);
     }
-    if (pagesCount > to) {
-        if (pagesCount - this.currPage >= 7) {
-            pages += moreSpan;
+    if (pc > to) {
+        if (pc - l.cp >= 7) {
+            ph += ms;
         }
-        pages += this.getGoToPageLink(pagesCount, false);
+        ph += this.gtp(pc, false);
     }
-    var select = '<select class="per-page" title="Rows on page">';
-    for (var j in this.perPageOptions) {
-        select += '<option value="' + this.perPageOptions[j] + '">' + this.perPageOptions[j] + '</option>';
+    var slc = '<select class="per-page" title="Rows on page">';
+    for (var j in l.ppo) {
+        slc += '<option value="' + l.ppo[j] + '">' + l.ppo[j] + '</option>';
     }
-    select += '</select>';
-    this.thead.append($('<tr class="pages"><th colspan="' + this.getObjectSize(this.columns) + '">' + pages +
+    slc += '</select>';
+    l.thead.append($('<tr class="pages"><th colspan="' + l.gos(l.co) + '">' + ph +
                         '<a href="#" class="csv" title="Export to CSV">csv</a>' +
-                        '<a href="#" class="refresh" title="Refresh page">refresh</a>' + select + '<span class="in-total">' +
-                        this.count + ' in total</span></th></tr>'));
-    var l = this;
-    this.thead.find('.go-to-page').click(function() {
-        l.currPage = parseInt($(this).attr('data-number'));
-        l.setState('currPage', l.currPage);
-        l.showData();
+                        '<a href="#" class="refresh" title="Refresh page">refresh</a>' + slc + '<span class="in-total">' +
+                        l.c + ' in total</span></th></tr>'));
+    l.thead.find('.go-to-page').click(function() {
+        l.cp = parseInt($(this).attr('data-number'));
+        l.ss('cp', l.cp);
+        l.sd();
         return false;
     });
-    this.thead.find('.per-page').change(function() {
-        l.rowsOnPage = $(this).val();
-        l.setState('rowsOnPage', l.rowsOnPage);
-        l.setState('currPage', 1);
-        l.currPage   = 1;
-        l.showData();
+    l.thead.find('.per-page').change(function() {
+        l.rop = $(this).val();
+        l.ss('rop', l.rop);
+        l.ss('cp', 1);
+        l.cp   = 1;
+        l.sd();
         return false;
-    }).val(this.rowsOnPage);
-    this.thead.find('.refresh').click(function() {
-        l.showData();
+    }).val(this.rop);
+    l.thead.find('.refresh').click(function() {
+        l.sd();
         return false;
     });
-    this.thead.find('.csv').click(function() {
-        var data = l.stringify(l.getPostData());
+    l.thead.find('.csv').click(function() {
+        var data = l.str(l.gpd());
         document.location.href = (l.url ? l.url : location.href) + '?cubique_data=' + encodeURIComponent(data);
         return false;
     });
@@ -264,74 +258,75 @@ Cubique.prototype.renderPagesSection = function Cubique_renderPagesSection()
 
 /**
  * Returns go-to-page link.
- * @param pageNumber number
- * @param isCurrent bool
+ * @param p number
+ * @param c bool
  * @return string
  */
-Cubique.prototype.getGoToPageLink = function Cubique_getGoToPageLink(pageNumber, isCurrent)
+Cubique.prototype.gtp = function Cubique_gtp(p, c)
 {
-    return '<a href="#" title="Go to page ' + pageNumber + '" class="go-to-page' + (isCurrent ? ' curr' : '') + '" data-number="' + pageNumber + '">' + pageNumber + '</a>'
+    return '<a href="#" title="Go to page ' + p + '" class="go-to-page' + (c ? ' curr' : '') + '" data-number="' + p + '">' + p + '</a>'
 }
 
 /**
  * Get object size.
- * @param obj object
+ * @param o object
  * @return int
  */
-Cubique.prototype.getObjectSize = function Cubique_getObjectSize(obj)
+Cubique.prototype.gos = function Cubique_gos(o)
 {
-    var size = 0;
-    for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            size++;
+    var s = 0;
+    for (var k in o) {
+        if (o.hasOwnProperty(k)) {
+            s++;
         }
     }
-    return size;
+    return s;
 }
 
 /**
  * Sets search data and makes AJAX request.
- * @param value object
- * @param type object
+ * @param v object
+ * @param t object
  * @return void
  */
-Cubique.prototype.makeSearch = function Cubique_makeSearch(value, type)
+Cubique.prototype.makeSearch = function Cubique_makeSearch(v, t)
 {
-    var searchColumn = value.attr('data-column'),
-        search       = [value.val(), type.val()];
-    if (this.searchValues[searchColumn] != search) {
-        this.search[searchColumn] = search;
-        this.setState('currPage', 1);
-        this.setState('search', this.stringify(this.search));
-        this.searchValues[searchColumn]  = search;
-        this.currPage = 1;
-        this.showData();
+    var sc = v.attr('data-column'),
+        sr = [v.val(), t.val()],
+        l  = this;
+    if (l.sv[sc] != sr) {
+        l.sr[sc] = sr;
+        l.ss('cp', 1);
+        l.ss('sr', l.str(l.sr));
+        l.sv[sc]  = sr;
+        l.cp = 1;
+        l.sd();
     }
 }
 
 /**
  * Returns JSON string.
- * @param obj object
+ * @param o object
  * @return string
  */
-Cubique.prototype.stringify = function Cubique_stringify(obj)
+Cubique.prototype.str = function Cubique_str(o)
 {
     if ('JSON' in window) {
-        return JSON.stringify(obj);
+        return JSON.stringify(o);
     }
 
-    var t = typeof (obj);
-    if (t != 'object' || obj === null) {
+    var t = typeof (o);
+    if (t != 'object' || o === null) {
         if (t == 'string') {
-            obj = '"' + obj + '"';
+            o = '"' + o + '"';
         }
-        return String(obj);
+        return String(o);
     } else {
-        var n, v, json = [], arr = (obj && obj.constructor == Array);
-        for (n in obj) {
-            v = obj[n];
+        var n, v, json = [], arr = (o && o.constructor == Array);
+        for (n in o) {
+            v = o[n];
             t = typeof(v);
-            if (obj.hasOwnProperty(n)) {
+            if (o.hasOwnProperty(n)) {
                 if (t == 'string') {
                     v = '"' + v + '"';
                 } else if (t == 'object' && v !== null) {
@@ -348,49 +343,53 @@ Cubique.prototype.stringify = function Cubique_stringify(obj)
 
 /**
  * Returns key value from local storage or cookies.
- * @param key string
+ * @param k string
  * @return string
  */
-Cubique.prototype.getState = function Cubique_getState(key)
+Cubique.prototype.gs = function Cubique_gs(k)
 {
-    key = this.name + '_' + key;
-    if (this.isLocalStorageAvailable) {
-        return localStorage.getItem(key);
+    var l = this,
+    k = l.n + '_' + k;
+    if (l.islsa) {
+        return localStorage.getItem(k);
     } else {
-        var cookie = ' ' + document.cookie,
-            search = ' ' + key + '=',
-            value = '',
-            offset = end = 0;
-        if (cookie.length > 0) {
-            offset = cookie.indexOf(search);
-            if (offset != -1) {
-                offset += search.length;
-                end = cookie.indexOf(';', offset);
-                if (end == -1) {
-                    end = cookie.length;
+        var c = ' ' + document.cookie,
+            sr = ' ' + k + '=',
+            v = '',
+            o = 0,
+            e = 0;
+        if (c.length > 0) {
+            o = c.indexOf(sr);
+            if (o != -1) {
+                o += sr.length;
+                e = c.indexOf(';', o);
+                if (e == -1) {
+                    e = c.length;
                 }
-                value = cookie.substring(offset, end);
+                v = c.substring(o, e);
             }
         }
-        return(value);
+        return(v);
     }
 }
 
 /**
  * Sets value of state in local storage or cookies.
- * @param key string
- * @param value string
+ * @param k string
+ * @param v string
  * @return void
  */
-Cubique.prototype.setState = function Cubique_setState(key, value)
+Cubique.prototype.ss = function Cubique_ss(k, v)
 {
-    key = this.name + '_' + key;
-    if (this.isLocalStorageAvailable) {
-        localStorage.setItem(key, value);
+    var now = new Date(),
+        ex  = now,
+        l   = this;
+    k = l.n + '_' + k;
+    if (l.islsa) {
+        localStorage.setItem(k, v);
     } else {
-        var now = expire = new Date();
-        expire.setTime(now.getTime() + 864000000); // Just 10 days
-        document.cookie = key + '=' + value + ';expires=' + expire.toGMTString() + ';path=/';
+        ex.setTime(now.getTime() + 864000000); // Just 10 days
+        document.cookie = k + '=' + v + ';expires=' + expire.toGMTString() + ';path=/';
     }
 }
 
@@ -398,15 +397,15 @@ Cubique.prototype.setState = function Cubique_setState(key, value)
  * Returns data for AJAX or CSV export.
  * @return obj
  */
-Cubique.prototype.getPostData = function Cubique_getPostData()
+Cubique.prototype.gpd = function Cubique_gpd()
 {
+    var l = this;
     return {
         cubique: {
-            name:         this.name,
-            curr_page:    this.currPage,
-            sort:         this.sort,
-            search:       this.search,
-            rows_on_page: this.rowsOnPage
+            cp:  l.cp,
+            so:  l.s,
+            sr:  l.sr,
+            rop: l.rop
         }
     };
 }
